@@ -1,6 +1,6 @@
 # qdfitness
 
-A new Flutter project.
+Simple flutter app to record food, exercise, and thoughts.
 
 ## Getting Started
 
