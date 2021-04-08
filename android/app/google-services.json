@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "812958055889",
+    "project_id": "qdfitness-b99b3",
+    "storage_bucket": "qdfitness-b99b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812958055889:android:3220de044bbc04cae0f4f0",
+        "android_client_info": {
+          "package_name": "com.qd.qdfitness"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812958055889-7tf7fmp396tk5mri5rbivfp2obhspc9g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIkj5dNNmX-Y7YioSzwF7xPrAa6iJNkc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812958055889-7tf7fmp396tk5mri5rbivfp2obhspc9g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
