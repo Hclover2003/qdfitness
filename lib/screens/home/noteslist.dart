@@ -15,20 +15,20 @@ class _NotesListState extends State<NotesList> {
   Widget build(BuildContext context) {
     final notes = Provider.of<List<Note>>(context) ?? [];
     notes.sort((b, a) => a.createdat.compareTo(b.createdat));
-    final Map<String, List<Note>> mymap = new Map();
+    // final Map<String, List<Note>> mymap = new Map();
 
-    for (var note in notes) {
-      var notedate = DateFormat.yMd().format(
-          DateTime.fromMillisecondsSinceEpoch(
-              note.createdat.millisecondsSinceEpoch));
-      if (mymap.containsKey(notedate)) {
-        mymap[notedate].add(note);
-      } else {
-        mymap[notedate] = [note];
-      }
-    }
+    // for (var note in notes) {
+    //   var notedate = DateFormat.yMd().format(
+    //       DateTime.fromMillisecondsSinceEpoch(
+    //           note.createdat.millisecondsSinceEpoch));
+    //   if (mymap.containsKey(notedate)) {
+    //     mymap[notedate].add(note);
+    //   } else {
+    //     mymap[notedate] = [note];
+    //   }
+    // }
     return ListView.builder(
-        itemCount: mymap.keys.toList().length,
+        itemCount: notes.length,
         itemBuilder: (context, index) {
           return NoteTile(note: notes[index]);
         });
