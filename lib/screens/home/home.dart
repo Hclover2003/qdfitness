@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
 import 'package:intl/intl.dart';
+import 'package:qdfitness/shared/shared.dart';
 
 class Home extends StatelessWidget {
   const Home({
@@ -32,8 +33,7 @@ class Home extends StatelessWidget {
             Container(
                 width: double.infinity,
                 height: 150.0,
-                decoration:
-                    BoxDecoration(color: Color.fromRGBO(40, 152, 170, 1)),
+                decoration: BoxDecoration(color: apptheme.c2),
                 child: Center(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

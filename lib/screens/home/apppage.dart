@@ -32,9 +32,8 @@ class _AppPageState extends State<AppPage> {
         ),
         drawer: UpperDrawer(),
         bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-              canvasColor: Color.fromRGBO(228, 94, 94, 1),
-              primaryColor: Colors.white),
+          data: Theme.of(context)
+              .copyWith(canvasColor: apptheme.c1, primaryColor: Colors.white),
           child: BottomNavigationBar(
             items: [
               BottomNavigationBarItem(

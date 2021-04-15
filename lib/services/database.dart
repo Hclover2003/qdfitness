@@ -12,11 +12,27 @@ class DatabaseService {
   final CollectionReference profilesCollection =
       FirebaseFirestore.instance.collection('profiles');
 
-  //update notes data
-  Future<void> updateNoteData(String note, String type, DateTime time) async {
+//NOTES
+  //create note
+  Future<void> createNote(String note, String type, DateTime time) async {
     return await notesCollection.doc(uid).collection("usernotes").doc().set({
       'note': note,
       'createdat': FieldValue.serverTimestamp(),
+      'type': type,
+      'time': Timestamp.fromDate(time)
+    });
+  }
+
+  //update note
+  Future<void> updateNote(
+      String note, String type, DateTime time, String id) async {
+    return await notesCollection
+        .doc(uid)
+        .collection('usernotes')
+        .doc(id)
+        .update({
+      'note': note,
+      'editedat': FieldValue.serverTimestamp(),
       'type': type,
       'time': Timestamp.fromDate(time)
     });
@@ -36,11 +52,19 @@ class DatabaseService {
     return snapshot.docs.map((doc) {
       return Note(
           note: doc.data()['note'],
+          id: doc.id,
           createdat: doc.data()['createdat'],
+          time: doc.data()['time'],
           type: doc.data()['type']);
     }).toList();
   }
 
+  //delete note
+  Future<void> deleteNote(String id) async {
+    return notesCollection.doc(uid).collection("usernotes").doc(id).delete();
+  }
+
+//USER
   //update user data
   Future<void> updateUserData(String name) async {
     return await profilesCollection.doc(uid).set({'name': name});

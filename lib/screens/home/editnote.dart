@@ -1,55 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:qdfitness/models/appuser.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:qdfitness/models/notes.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/shared.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
-class Log extends StatefulWidget {
+class EditNote extends StatefulWidget {
+  final Note note;
+  final String uid;
+  EditNote({this.note, this.uid});
   @override
-  _LogState createState() => _LogState();
+  _EditNoteState createState() => _EditNoteState();
 }
 
-class _LogState extends State<Log> {
-  bool _foodPressed = true;
-  bool _exercisePressed = false;
-  bool _thoughtPressed = false;
+class _EditNoteState extends State<EditNote> {
+  String _note;
+  String _type;
+  DateTime _time;
 
-  String _note = "";
-  String _type = "food";
-  DateTime _time = DateTime.now();
+  bool _foodPressed;
+  bool _exercisePressed;
+  bool _thoughtPressed;
 
-  final fieldText = TextEditingController();
-  void clearText() {
-    fieldText.clear();
+  @override
+  void initState() {
+    super.initState();
+    _note = widget.note.note;
+    _type = widget.note.type;
+    _time = widget.note.time.toDate();
+
+    _foodPressed = (_type == 'food');
+    _exercisePressed = (_type == 'exercise');
+    _thoughtPressed = (_type == 'thought');
   }
+
+  double _height = 20.0;
 
   @override
   Widget build(BuildContext context) {
-    final userdata = Provider.of<UserData>(context);
-    final DatabaseService _db = DatabaseService(uid: userdata.uid);
+    final DatabaseService _db = DatabaseService(uid: widget.uid);
 
-    return Stack(children: [
-      Container(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                image: AssetImage("assets/images/8.png"),
-                fit: BoxFit.cover)),
-      ),
-      Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          Text("choose a category"),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                //type
                 Container(
-                    height: 100.0,
+                    height: _height,
                     width: 100,
                     decoration: logOption.copyWith(
                         color: _foodPressed ? apptheme.c1 : apptheme.c1l,
@@ -57,7 +59,7 @@ class _LogState extends State<Log> {
                             color: _foodPressed ? apptheme.c1 : apptheme.c1l)),
                     child: TextButton(
                       child: Text(
-                        'Food',
+                        '',
                         style: TextStyle(
                             color: _foodPressed ? apptheme.c1l : apptheme.c1),
                       ),
@@ -75,7 +77,7 @@ class _LogState extends State<Log> {
                       },
                     )),
                 Container(
-                    height: 100.0,
+                    height: _height,
                     width: 100,
                     decoration: logOption.copyWith(
                         color: _exercisePressed ? apptheme.c2 : apptheme.c2l,
@@ -84,7 +86,7 @@ class _LogState extends State<Log> {
                         )),
                     child: TextButton(
                       child: Text(
-                        'Exercise',
+                        '',
                         style: TextStyle(
                             color:
                                 _exercisePressed ? apptheme.c2l : apptheme.c2),
@@ -101,7 +103,7 @@ class _LogState extends State<Log> {
                       },
                     )),
                 Container(
-                    height: 100.0,
+                    height: _height,
                     width: 100,
                     decoration: logOption.copyWith(
                         color: _thoughtPressed ? apptheme.c3 : apptheme.c3l,
@@ -110,7 +112,7 @@ class _LogState extends State<Log> {
                         )),
                     child: TextButton(
                       child: Text(
-                        'Thought',
+                        '',
                         style: TextStyle(
                             color:
                                 _thoughtPressed ? apptheme.c3l : apptheme.c3),
@@ -129,15 +131,15 @@ class _LogState extends State<Log> {
               ],
             ),
           ),
-          Text("write a note"),
           SizedBox(
             height: 10,
           ),
+          //note
           Container(
               constraints: BoxConstraints(maxHeight: 200),
               width: 250,
               child: TextFormField(
-                controller: fieldText,
+                initialValue: _note,
                 decoration: logFormDecoration.copyWith(
                     fillColor: _foodPressed
                         ? apptheme.c1l
@@ -151,12 +153,9 @@ class _LogState extends State<Log> {
                 },
               )),
           SizedBox(
-            height: 10,
+            height: 20,
           ),
-          Text("set a time"),
-          SizedBox(
-            height: 10,
-          ),
+          //time
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -178,7 +177,7 @@ class _LogState extends State<Log> {
                       }, onConfirm: (date) {
                         print('confirm $date');
                         setState(() => _time = date);
-                      }, currentTime: DateTime.now());
+                      }, currentTime: _time);
                     },
                     child: Text(DateFormat.MMMd().add_jm().format(_time),
                         style: TextStyle(
@@ -193,6 +192,7 @@ class _LogState extends State<Log> {
           SizedBox(
             height: 30,
           ),
+          //submit
           SizedBox(
             height: 60,
             width: 100,
@@ -206,11 +206,9 @@ class _LogState extends State<Log> {
                       ? apptheme.c1
                       : (_exercisePressed ? apptheme.c2 : apptheme.c3)),
               onPressed: () async {
-                await _db.createNote(_note, _type, _time);
-                clearText();
-                setState(() => _time = DateTime.now());
+                await _db.updateNote(_note, _type, _time, widget.note.id);
                 Fluttertoast.showToast(
-                    msg: "success! note added",
+                    msg: "success! note edited",
                     toastLength: Toast.LENGTH_LONG,
                     gravity: ToastGravity.TOP,
                     backgroundColor: _foodPressed
@@ -223,8 +221,11 @@ class _LogState extends State<Log> {
               },
             ),
           ),
+          SizedBox(
+            height: 30.0,
+          )
         ],
-      )
-    ]);
+      ),
+    );
   }
 }

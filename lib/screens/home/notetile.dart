@@ -9,25 +9,29 @@ class NoteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final createdat = DateFormat.MMMd()
-        .add_jm()
-        .format(DateTime.fromMillisecondsSinceEpoch(
-            note.createdat.millisecondsSinceEpoch))
-        .toString();
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Card(
-        margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
-        child: ListTile(
-            leading: CircleAvatar(
-              radius: 25.0,
-              backgroundColor: (note.type == 'food')
-                  ? myPink
-                  : (note.type == 'exercise' ? myLBlue : myLYellow),
+    return (note.time == null)
+        ? SizedBox(
+            height: 10,
+          )
+        : Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Card(
+              margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
+              child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 25.0,
+                    backgroundColor: (note.type == 'food')
+                        ? apptheme.c1l
+                        : (note.type == 'exercise'
+                            ? apptheme.c2l
+                            : apptheme.c3l),
+                  ),
+                  title: Text(note.note),
+                  subtitle: Text(DateFormat.MMMd()
+                      .add_jm()
+                      .format(note.time.toDate())
+                      .toString())),
             ),
-            title: Text(note.note),
-            subtitle: Text(createdat)),
-      ),
-    );
+          );
   }
 }

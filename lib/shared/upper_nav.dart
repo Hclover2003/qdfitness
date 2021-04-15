@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:qdfitness/screens/home/settings.dart';
+import 'package:qdfitness/screens/menu/aboutus.dart';
 import 'package:qdfitness/services/auth.dart';
 
 class UpperDrawer extends StatelessWidget {
@@ -20,15 +22,15 @@ class UpperDrawer extends StatelessWidget {
           ListTile(
             title: Text('about us'),
             onTap: () {
-              // Update the state of the app.
-              // ...
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => AboutUs()));
             },
           ),
           ListTile(
             title: Text('settings'),
             onTap: () {
-              // Update the state of the app.
-              // ...
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Settings()));
             },
           ),
           ListTile(
