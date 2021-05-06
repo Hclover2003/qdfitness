@@ -34,7 +34,14 @@ class AboutUs extends StatelessWidget {
                 child: Image(image: AssetImage('assets/images/wakeup.jpg')),
               ),
               Text(
-                  "     This is an easy, straightforward app to record the everyday things of your life. You can use it as a fitness tracker, a food/exercise diary, a simple notes app, or all in one! There are other apps out there for more in depth calorie analysis, etc., but the purpose of this app is to provide a simple, hassle free method to keep track of what I was eating and how much I was exercising on a regular basis. As I started creating the app, I realized the utility of a 'thought' optiion as well to just jot down random thoughts during the day."),
+                  "     This is an easy, straightforward app to record the everyday things of your life. You can use it as a fitness tracker, a food/exercise diary, a simple notes app, or all in one! NOTE: There are other apps out there for more in depth calorie analysis. The purpose of this app is to provide a very simple, hassle free overview to keep track of what I was eating and how much I was exercising on a regular basis. As I started creating the app, I realized the utility of a 'thought' optiion as well to just jot down random thoughts during the day."),
+              Subtitle(text: "note about the calorie tracker"),
+              Padding(
+                padding: mypadding,
+                child: Image(image: AssetImage('assets/images/future.jpg')),
+              ),
+              Text(
+                  "    (in the works; may work for some foods and fail for others TT) As someone who is not good at sticking to complex routines, I chose to forego searches with hundreds of options such as 'ex. Bibigo Mini Wontons' for a simple automated stat for 'wonton'. The pros and cons of this decision are evident, trading in detail and accuracy for time and ease of use. In short, this is a very simplified calorie tracker that should be used as an estimate only. While not completely accurate, it shouldn’t deviate enormously between foods and is meant as a fun little supplement to your everyday food/exercise tracking routine. There are many existing apps out there for calorie tracking in greater depth and detail, that you can use instead (or in complement) with this app if that is what you are looking for."),
               Subtitle(text: "what's next?"),
               Padding(
                 padding: mypadding,

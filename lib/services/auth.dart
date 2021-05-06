@@ -9,7 +9,7 @@ class AuthService {
 
   // create user obj based on firebase user; private function
   AppUser _userFromFirebaseUser(User user) {
-    return user != null ? AppUser(uid: user.uid) : null;
+    return user != null ? AppUser(uid: user.uid, dailyCalorieTotal: 0) : null;
   }
 
   //auth change user stream (get a stream of Users and map each into our own AppUser)

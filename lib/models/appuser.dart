@@ -1,9 +1,10 @@
 class AppUser {
   //final: property that won't change as user goes between diff screens
   final String uid;
+  int dailyCalorieTotal;
 
   //set property in constructor; named parameters
-  AppUser({this.uid});
+  AppUser({this.uid, this.dailyCalorieTotal});
 }
 
 class UserData {

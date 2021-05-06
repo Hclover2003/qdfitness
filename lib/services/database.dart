@@ -14,12 +14,15 @@ class DatabaseService {
 
 //NOTES
   //create note
-  Future<void> createNote(String note, String type, DateTime time) async {
+  Future<void> createNote(String note, String type, DateTime time,
+      double fistfuls, int calories) async {
     return await notesCollection.doc(uid).collection("usernotes").doc().set({
       'note': note,
       'createdat': FieldValue.serverTimestamp(),
       'type': type,
-      'time': Timestamp.fromDate(time)
+      'time': Timestamp.fromDate(time),
+      'fistfuls': fistfuls,
+      'calories': calories
     });
   }
 
@@ -55,7 +58,9 @@ class DatabaseService {
           id: doc.id,
           createdat: doc.data()['createdat'],
           time: doc.data()['time'],
-          type: doc.data()['type']);
+          type: doc.data()['type'],
+          fistfuls: doc.data()['fistfuls'],
+          calories: doc.data()['calories']);
     }).toList();
   }
 

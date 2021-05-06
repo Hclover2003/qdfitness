@@ -76,6 +76,7 @@ class _NotesListState extends State<NotesList> {
         itemCount: notescopy.length,
         itemBuilder: (context, index) {
           final note = notescopy[index];
+          print(note.fistfuls);
           return (note.type == "heading")
               ? HeadingTile(
                   note: note,

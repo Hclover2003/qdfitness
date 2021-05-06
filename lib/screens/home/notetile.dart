@@ -18,6 +18,9 @@ class NoteTile extends StatelessWidget {
             child: Card(
               margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
               child: ListTile(
+                  trailing: Text((note.calories == null)
+                      ? ''
+                      : note.calories.toString() + " cal"),
                   leading: CircleAvatar(
                     radius: 25.0,
                     backgroundColor: (note.type == 'food')
