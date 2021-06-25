@@ -32,7 +32,8 @@ class _DiaryState extends State<Diary> {
         Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("assets/images/9.png"), fit: BoxFit.cover)),
+                  image: AssetImage("assets/images/backg2.png"),
+                  fit: BoxFit.cover)),
         ),
         Column(
           children: [

@@ -21,19 +21,28 @@ class _AppPageState extends State<AppPage> {
   Widget build(BuildContext context) {
     final user = Provider.of<AppUser>(context);
     return StreamProvider<UserData>.value(
-      initialData: UserData(uid: '0', name: 'bob'),
+      initialData: UserData(uid: '0', name: 'guest'),
       value: DatabaseService(uid: user.uid).userData,
       child: Scaffold(
+        backgroundColor: Theme.of(context).backgroundColor,
+        //don't resize with onscreen keyboard
         resizeToAvoidBottomInset: false,
+
+        //appbar
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).backgroundColor,
           elevation: 0,
-          iconTheme: IconThemeData(color: Color.fromRGBO(223, 169, 70, 1)),
+          iconTheme: IconThemeData(color: Theme.of(context).accentColor),
         ),
+
+        //side menu
         drawer: UpperDrawer(),
+
+        //bottom options
         bottomNavigationBar: Theme(
-          data: Theme.of(context)
-              .copyWith(canvasColor: apptheme.c1, primaryColor: Colors.white),
+          data: Theme.of(context).copyWith(
+              canvasColor: Theme.of(context).primaryColor,
+              primaryColor: Theme.of(context).backgroundColor),
           child: BottomNavigationBar(
             items: [
               BottomNavigationBarItem(

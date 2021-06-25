@@ -12,7 +12,7 @@ class DatabaseService {
   final CollectionReference profilesCollection =
       FirebaseFirestore.instance.collection('profiles');
 
-//NOTES
+  //NOTES
   //create note
   Future<void> createNote(String note, String type, DateTime time,
       double fistfuls, int calories) async {
@@ -70,20 +70,21 @@ class DatabaseService {
   }
 
 //USER
-  //update user data
+  //update user document details
   Future<void> updateUserData(String name) async {
-    return await profilesCollection.doc(uid).set({'name': name});
+    return await profilesCollection.doc(uid).set(
+        {'name': name, 'createdAt': DateTime.now().millisecondsSinceEpoch});
   }
 
-  //userData from snapshot
+  //maps data from document snapshot -> UserData object
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
     return UserData(
-      uid: uid,
-      name: snapshot.data()['name'],
-    );
+        uid: uid,
+        name: snapshot.data()['name'],
+        createdAt: snapshot.data()['createdAt']);
   }
 
-  //get userData stream
+  //stream; gets doc info and maps to UserData
   Stream<UserData> get userData {
     return profilesCollection.doc(uid).snapshots().map(_userDataFromSnapshot);
   }
