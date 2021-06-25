@@ -25,29 +25,14 @@ class UpperDrawer extends StatelessWidget {
                 color: Theme.of(context).primaryColor,
               ),
             ),
+            MenuTile(text: "about us", path: AboutUs()),
+            MenuTile(text: "settings", path: Settings()),
+            MenuTile(text: "theme", path: ThemeChanger()),
             ListTile(
-              title: Text('about us'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AboutUs()));
-              },
-            ),
-            ListTile(
-              title: Text('settings'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Settings()));
-              },
-            ),
-            ListTile(
-              title: Text('theme'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ThemeChanger()));
-              },
-            ),
-            ListTile(
-              title: Text('logout'),
+              title: Text(
+                'logout',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
               onTap: () {
                 showAlertDialog(context);
               },
@@ -55,6 +40,28 @@ class UpperDrawer extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MenuTile extends StatelessWidget {
+  final String text;
+  final Widget path;
+  MenuTile({this.text, this.path});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .bodyText2
+            .copyWith(color: Theme.of(context).primaryColor),
+      ),
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => path));
+      },
     );
   }
 }

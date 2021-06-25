@@ -81,7 +81,7 @@ class Subtitle extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 10.0),
       child: Text(
         text,
-        style: TextStyle(fontSize: 20.0),
+        style: TextStyle(fontSize: 20.0, color: Theme.of(context).primaryColor),
       ),
     );
   }

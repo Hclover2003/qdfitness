@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
+import 'package:qdfitness/screens/home/imagedialog.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/shared.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -26,11 +27,19 @@ class _LogState extends State<Log> {
   DateTime _time = DateTime.now();
   String imgurl = "";
 
+  int currenti = 0;
+  List validproducts = [];
+  List products = [];
+  int productslength = 0;
+
   bool countCalories = false;
-  double fistfuls;
-  int caloriesPer100g;
+  double amount;
+  String unit = "fistfuls";
+  int caloriesPer100g = 0;
   int calories = 0;
-  String error = '';
+  String error;
+
+  String searchText = "search";
 
   int _radioValue1 = 0;
 
@@ -46,7 +55,7 @@ class _LogState extends State<Log> {
   void _handleRadioValueChange1(int value) {
     setState(() {
       _radioValue1 = value;
-      print(_radioValue1);
+      unit = (value == 0) ? "fistfuls" : "fingertips";
     });
   }
 
@@ -58,18 +67,37 @@ class _LogState extends State<Log> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              child: Text(
-                "Current: 102 Calories",
-                style: TextStyle(fontSize: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Transform.scale(
+                scale: 1.3,
+                child: Theme(
+                  child: Checkbox(
+                    value: countCalories,
+                    onChanged: (newValue) {
+                      setState(() {
+                        countCalories = newValue;
+                        print(countCalories);
+                      });
+                    },
+                  ),
+                  data: ThemeData(
+                      unselectedWidgetColor: Theme.of(context).primaryColor),
+                ),
               ),
-            ),
+              Text(
+                countCalories ? "190 Calories" : "count calories?",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5
+                    .copyWith(color: Theme.of(context).primaryColor),
+              ),
+            ],
           ),
           //row of three boxes
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -155,42 +183,24 @@ class _LogState extends State<Log> {
             ),
           ),
 
-          //checkbox tile for food and exercise calorie counter option
-          (() {
-            return (_foodPressed | _exercisePressed)
-                ? CheckboxListTile(
-                    title: Text(
-                      "count calories?",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    value: countCalories,
-                    onChanged: (newValue) {
-                      setState(() {
-                        countCalories = newValue;
-                        print(countCalories);
-                      });
-                    },
-                    controlAffinity: ListTileControlAffinity.leading,
-                  )
-                : SizedBox();
-          }()),
           //if checkbox checked, return diff things for food/exercise
           (() {
             return (countCalories)
                 ? (_foodPressed)
                     ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
                         child: Row(
                           children: [
                             Expanded(
                               child: TextFormField(
                                 controller: fieldText2,
                                 onChanged: (val) {
-                                  setState(() => fistfuls = double.parse(val));
-                                  print(fistfuls);
+                                  setState(() => amount = double.parse(val));
+                                  print(amount);
                                 },
                                 decoration: logFormDecoration.copyWith(
-                                    hintText: 'fistfuls',
+                                    hintText: 'amount',
                                     filled: true,
                                     fillColor: apptheme.c1l),
                                 keyboardType: TextInputType.number,
@@ -240,7 +250,7 @@ class _LogState extends State<Log> {
                           width: 100,
                           child: TextButton(
                             child: Text(
-                              'search',
+                              searchText,
                               style: TextStyle(color: Colors.white),
                             ),
                             style: TextButton.styleFrom(
@@ -250,35 +260,47 @@ class _LogState extends State<Log> {
                                         ? apptheme.c2
                                         : apptheme.c3)),
                             onPressed: () async {
+                              setState(() {
+                                searchText = "...";
+                              });
+                              FocusManager.instance.primaryFocus?.unfocus();
                               Response response = await get(Uri.parse(
                                   'https://world.openfoodfacts.org/category/$_note.json'));
                               print('success');
+                              setState(() {
+                                searchText = "search";
+                              });
 
                               Map data = jsonDecode(response.body);
-                              List products = data['products'];
 
-                              if (products.length == 0) {
+                              setState(() {
+                                products = data['products'];
+                                validproducts = products
+                                    .where((i) =>
+                                        (i['nutriments']['energy-kj_100g'] !=
+                                            null) &
+                                        (i['image_front_small_url'] != null))
+                                    .toList();
+                                error = null;
+                              });
+
+                              if (validproducts.length == 0) {
                                 print('nothing found');
                                 setState(() {
                                   error = "nothing found";
+                                  validproducts = [];
+                                  imgurl = "";
+                                  calories = 0;
+                                  caloriesPer100g = 0;
                                 });
                               } else {
-                                //filters out items with calorie data
-                                List validproducts = products
-                                    .where((i) =>
-                                        i['nutriments']['energy-kcal_100g'] !=
-                                        null)
-                                    .toList();
-
+                                print("these are the valid products");
+                                print(validproducts);
                                 setState(() {
-                                  imgurl =
-                                      validproducts[0]['image_front_small_url'];
-                                  caloriesPer100g = validproducts[0]
-                                      ['nutriments']['energy-kcal_100g'];
-                                  calories = (caloriesPer100g * 2.5 * fistfuls)
-                                      .toInt();
-                                  print(imgurl);
+                                  currenti = 0;
                                 });
+                                //filters out items with calorie data
+                                setFoodCalories();
 
                                 //takes average
 
@@ -338,22 +360,88 @@ class _LogState extends State<Log> {
           SizedBox(
             height: 10,
           ),
+          //image and calorie data
           (() {
-            return (countCalories & (calories != null))
+            return (countCalories & _foodPressed)
                 ? Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Container(
-                      height: 50.0,
-                      color: apptheme.c1l,
-                      child: Center(
-                        child: Text(
-                            "$fistfuls fistfuls x $caloriesPer100g calories/100g = $calories calories"),
-                      ),
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: Row(
+                      children: [
+                        (validproducts.length > 1)
+                            ? TextButton(
+                                child: Text("<"),
+                                onPressed: () {
+                                  setState(() {
+                                    currenti = (currenti > 0)
+                                        ? currenti - 1
+                                        : validproducts.length - 1;
+                                  });
+                                  setFoodCalories();
+                                },
+                              )
+                            : SizedBox(),
+                        Expanded(
+                          flex: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                            child: GestureDetector(
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(imgurl)),
+                              onTap: () async {
+                                await showDialog(
+                                    context: context,
+                                    builder: (_) => ImageDialog(
+                                          imgurl: imgurl,
+                                        ));
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 6,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  (error != null)
+                                      ? error
+                                      : "$calories calories",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline5,
+                                ),
+                                Text(
+                                  (error != null)
+                                      ? "go to about for search tips"
+                                      : "$caloriesPer100g calories/100g",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2
+                                      .copyWith(fontStyle: FontStyle.italic),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        (validproducts.length > 1)
+                            ? TextButton(
+                                child: Text(">"),
+                                onPressed: () {
+                                  setState(() {
+                                    currenti = (currenti < validproducts.length)
+                                        ? currenti + 1
+                                        : 0;
+                                  });
+                                  setFoodCalories();
+                                },
+                              )
+                            : SizedBox()
+                      ],
                     ),
                   )
-                : SizedBox(
-                    height: 15,
-                  );
+                : SizedBox();
           }()),
           SizedBox(
             height: 5,
@@ -399,7 +487,7 @@ class _LogState extends State<Log> {
                       ? apptheme.c1
                       : (_exercisePressed ? apptheme.c2 : apptheme.c3)),
               onPressed: () async {
-                await _db.createNote(_note, _type, _time, fistfuls, calories);
+                await _db.createNote(_note, _type, _time, amount, calories);
                 clearText();
                 setState(() => _time = DateTime.now());
                 Fluttertoast.showToast(
@@ -416,8 +504,26 @@ class _LogState extends State<Log> {
               },
             ),
           ),
+          SizedBox(
+            height: 20,
+          )
         ],
       ),
     );
+  }
+
+  void setFoodCalories() {
+    return setState(() {
+      imgurl = validproducts[currenti]['image_front_small_url'];
+      caloriesPer100g =
+          (validproducts[currenti]['nutriments']['energy-kj_100g'] is String)
+              ? double.parse(
+                  validproducts[currenti]['nutriments']['energy-kj_100g'] * 0.2)
+              : (validproducts[currenti]['nutriments']['energy-kj_100g'] * 0.2)
+                  .toInt();
+      calories = (caloriesPer100g * (unit == 'fistfuls' ? 2.5 : 0.04) * amount)
+          .toInt();
+      print(imgurl);
+    });
   }
 }

@@ -32,14 +32,6 @@ class _ThemeChangerState extends State<ThemeChanger> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: 4,
-            ),
-            //current theme colors
-            Text(
-              "Current Theme Colors",
-              style: Theme.of(context).textTheme.headline5,
-            ),
             SizedBox(height: 8),
             _themeColorContainer(
                 "Primary Color", Theme.of(context).primaryColor),

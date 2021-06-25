@@ -21,8 +21,7 @@ class Home extends StatelessWidget {
       Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("assets/images/backg1.png"),
-                fit: BoxFit.cover)),
+                image: AssetImage("assets/images/3tr.png"), fit: BoxFit.cover)),
       ),
       Center(
         child: Container(
@@ -37,17 +36,25 @@ class Home extends StatelessWidget {
               ),
             ),
             Container(
-              height: 80,
+              height: 100,
               width: double.infinity,
               color: Theme.of(context).primaryColor,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                      "Life is like riding a bicycle. To keep your balance, you must keep moving.",
-                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                  child: TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    controller: TextEditingController(
+                        text:
+                            "Life is like riding a bicycle. To keep your balance, you must keep moving."),
+                    style: Theme.of(context).textTheme.bodyText2.copyWith(
                           color: Theme.of(context).backgroundColor,
-                          fontStyle: FontStyle.italic)),
+                          fontStyle: FontStyle.italic,
+                        ),
+                    decoration:
+                        InputDecoration.collapsed(border: InputBorder.none),
+                  ),
                 ),
               ),
             ),

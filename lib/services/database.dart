@@ -12,6 +12,25 @@ class DatabaseService {
   final CollectionReference profilesCollection =
       FirebaseFirestore.instance.collection('profiles');
 
+//TOTAL DATA
+//create
+  Future<void> createTotal(DateTime date, int calories) async {
+    return await notesCollection
+        .doc(uid)
+        .collection("usernotes")
+        .doc()
+        .set({'date': date, 'totalcal': calories});
+  }
+
+  //update
+  Future<void> updateTotal(int calories, String id) async {
+    return await notesCollection
+        .doc(uid)
+        .collection('usernotes')
+        .doc(id)
+        .update({'totalcal': 39});
+  }
+
   //NOTES
   //create note
   Future<void> createNote(String note, String type, DateTime time,
