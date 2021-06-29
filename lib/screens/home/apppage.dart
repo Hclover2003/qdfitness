@@ -6,6 +6,7 @@ import 'package:qdfitness/screens/home/background.dart';
 import 'package:qdfitness/screens/home/diary.dart';
 import 'package:qdfitness/screens/home/home.dart';
 import 'package:qdfitness/screens/home/log.dart';
+import 'package:qdfitness/screens/home/logfood.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/theme_notifier.dart';
 import '../../shared/shared.dart';
@@ -17,7 +18,7 @@ class AppPage extends StatefulWidget {
 
 class _AppPageState extends State<AppPage> {
   int i = 0;
-  var pages = [Home(), Log(), Diary()];
+  var pages = [Home(), LogFood(), Log(), Diary()];
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class _AppPageState extends State<AppPage> {
     return StreamProvider<UserData>.value(
       initialData: UserData(uid: '0', name: 'guest'),
       value: DatabaseService(uid: user.uid).userData,
+      //exit keyboard focus when press elsewhere on screen
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
@@ -73,7 +75,13 @@ class _AppPageState extends State<AppPage> {
                     label: 'home'),
                 BottomNavigationBarItem(
                     icon: Icon(
-                      FontAwesomeIcons.featherAlt,
+                      FontAwesomeIcons.utensils,
+                      size: 20,
+                    ),
+                    label: 'logfood'),
+                BottomNavigationBarItem(
+                    icon: Icon(
+                      FontAwesomeIcons.dumbbell,
                       size: 20,
                     ),
                     label: 'log'),

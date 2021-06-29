@@ -21,129 +21,70 @@ class Home extends StatelessWidget {
       Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("assets/images/3tr.png"), fit: BoxFit.cover)),
+                image: AssetImage("assets/images/imgs.png"),
+                fit: BoxFit.cover)),
       ),
       Center(
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-          child: Column(children: [
-            Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/avatar1.png'),
-                radius: 80,
+          child: Column(
+            children: [
+              Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
+              SummaryRow(
+                name: "Food",
+                cal: '159',
+                icon: Icons.add,
               ),
-            ),
-            Container(
-              height: 100,
-              width: double.infinity,
-              color: Theme.of(context).primaryColor,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextField(
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    controller: TextEditingController(
-                        text:
-                            "Life is like riding a bicycle. To keep your balance, you must keep moving."),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                          color: Theme.of(context).backgroundColor,
-                          fontStyle: FontStyle.italic,
-                        ),
-                    decoration:
-                        InputDecoration.collapsed(border: InputBorder.none),
-                  ),
-                ),
+              SummaryRow(
+                name: "Exercise",
+                cal: '-12',
+                icon: Icons.add,
               ),
-            ),
-            Expanded(
-                flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                        flex: 5,
-                        child: Container(
-                          child: Text(
-                            currenttime,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline2
-                                .copyWith(
-                                    color: Theme.of(context).primaryColor),
-                          ),
-                        )),
-                    Expanded(
-                        flex: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    child: Text(
-                                      "Days Joined",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                    ),
-                                  )),
-                              Expanded(
-                                  flex: 3,
-                                  child: Container(
-                                    child: Text(
-                                      "56",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                    ),
-                                  )),
-                              Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    child: Text(
-                                      "Items Logged",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                    ),
-                                  )),
-                              Expanded(
-                                  flex: 3,
-                                  child: Container(
-                                    child: Text(
-                                      "1028",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline4
-                                          .copyWith(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                    ),
-                                  )),
-                            ],
-                          ),
-                        ))
-                  ],
-                )),
-            Spacer()
-          ]),
+              SummaryRow(
+                name: "Metabolism",
+                cal: '-59',
+                icon: Icons.edit,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: Text(
+                    "Total",
+                    style: Theme.of(context).textTheme.headline5,
+                  )),
+                  Expanded(
+                      child: Text(
+                    "129 cal",
+                    style: Theme.of(context).textTheme.headline4,
+                  ))
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     ]);
+  }
+}
+
+class SummaryRow extends StatelessWidget {
+  final String name;
+  final String cal;
+  final IconData icon;
+
+  SummaryRow({this.name, this.cal, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(child: Text(name)),
+          Expanded(child: Text(cal)),
+          Expanded(child: Icon(icon))
+        ],
+      ),
+    );
   }
 }
