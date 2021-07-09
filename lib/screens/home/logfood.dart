@@ -3,6 +3,22 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class LogFood extends StatefulWidget {
+  final List<String> meals = ['breakfast', 'lunch', 'dinner', 'snacks'];
+  final List<String> foodGroups = ['grains', 'fruits', 'veggies'];
+  final Map<String, List<String>> foodTypes = {
+    'grains': ['rice', 'pasta', 'bread'],
+    'fruits': ['common', 'tropical', 'berries'],
+    'veggies': ['green', 'roots', 'colors']
+  };
+  final Map<String, List<String>> foodNames = {
+    'rice': ['normal', 'fried', 'sticky'],
+    'pasta': ['noodles', 'spaghetti', 'macandcheese'],
+    'bread': ['white', 'wheat', 'sweet'],
+    'common': ['apple', 'orange', 'pear'],
+    'tropical': ['pineapple', 'mango', 'lychee'],
+    'berries': ['blueberry', 'strawberry', 'grape']
+  };
+
   @override
   _LogFoodState createState() => _LogFoodState();
 }
@@ -14,20 +30,17 @@ class _LogFoodState extends State<LogFood> {
           : "lunch"
       : "breakfast";
 
-  String selectedGrain = "rice";
-  String selectedFruit = "common";
-  String selectedVeggie = "leaves";
-  String selectedDairy = "milk";
-  String selectedDrink = "nocal";
+  String selectedGroup = "grain";
+  String selectedType = "rice";
+  List<String> selectedFoods = [];
 
-  Color grainColor = Colors.orange;
-  Color fruitColor = Colors.pinkAccent;
-  Color veggieColor = Colors.lightGreen;
-  Color dairyColor = Colors.blueAccent;
-  Color drinkColor = Colors.yellow[600];
-  Color othersColor = Colors.purple[100];
+  List<String> types;
 
-  TabController _grainController;
+  @override
+  void initState() {
+    super.initState();
+    types = widget.foodTypes['grains'];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,113 +48,198 @@ class _LogFoodState extends State<LogFood> {
         child: Center(
       child: Column(
         children: [
-          Text("189cal"),
-          Container(
-            width: 100,
-            height: 10,
-            color: Colors.red,
+          Text(
+            "189 cal",
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: Center(child: TextButton(child: Text("-")))),
+                Expanded(flex: 1, child: Center(child: Text("2"))),
+                Expanded(flex: 1, child: Center(child: Text("+"))),
+                Expanded(
+                  flex: 5,
+                  child: Center(child: Text("apples")),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Center(child: Text("29 cal")),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: Center(child: TextButton(child: Text("-")))),
+                Expanded(flex: 1, child: Center(child: Text("2"))),
+                Expanded(flex: 1, child: Center(child: Text("+"))),
+                Expanded(
+                  flex: 5,
+                  child: Center(child: Text("apples")),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Center(child: Text("29 cal")),
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Row(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: Center(child: TextButton(child: Text("-")))),
+                Expanded(flex: 1, child: Center(child: Text("2"))),
+                Expanded(flex: 1, child: Center(child: Text("+"))),
+                Expanded(
+                  flex: 5,
+                  child: Center(child: Text("apples")),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Center(child: Text("29 cal")),
+                )
+              ],
+            ),
           ),
           Row(
             children: [
-              mealOption("breakfast"),
-              mealOption("lunch"),
-              mealOption("dinner"),
-              mealOption("snack"),
+              for (var i in widget.meals)
+                foodBoxOption(i, 50, selectedMeal, 'meal')
             ],
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           Row(children: [
-            typeOption("rice", grainColor),
-            typeOption("pasta", grainColor),
-            typeOption("bread", grainColor),
-            typeOption("other", grainColor),
+            for (var i in widget.foodGroups)
+              foodBoxOption(i, 50, selectedGroup, 'group')
           ]),
+          SizedBox(
+            height: 10,
+          ),
           Row(children: [
-            typeOption("common", fruitColor),
-            typeOption("berries", fruitColor),
-            typeOption("melons", fruitColor),
-            typeOption("tropical", fruitColor),
+            for (var i in types) foodBoxOption(i, 50, selectedType, 'type')
           ]),
-          Row(children: [
-            typeOption("leaves", veggieColor),
-            typeOption("fruits", veggieColor),
-            typeOption("stems", veggieColor),
-            typeOption("bulbs", veggieColor),
-          ]),
-          Row(children: [
-            typeOption("milk", dairyColor),
-            typeOption("cheese", dairyColor),
-            typeOption("yogurt", dairyColor),
-            typeOption("sweets", dairyColor),
-          ]),
-          Row(children: [
-            typeOption("nocal", drinkColor),
-            typeOption("soup", drinkColor),
-            typeOption("pop", drinkColor),
-            typeOption("juice", drinkColor),
-          ]),
+          SizedBox(
+            height: 10,
+          ),
+          GridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 3,
+            children: [for (var i in widget.foodNames['rice']) foodOption(i)],
+          )
         ],
       ),
     ));
   }
 
-  Expanded typeOption(String type, Color color) {
-    return Expanded(
-      flex: (selectedGrain == type) ? 3 : 1,
-      child: TextButton(
-        onPressed: () {
+  Padding foodOption(String name) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GestureDetector(
+        onTap: () {
           setState(() {
-            selectedGrain = type;
+            if (selectedFoods.contains(name)) {
+              selectedFoods.remove(name);
+            } else {
+              selectedFoods.add(name);
+            }
           });
         },
-        child: Text(
-          type,
-          style: TextStyle(color: Colors.white70),
-        ),
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
+        child: Container(
+            decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.all(Radius.circular(100)),
+                image: DecorationImage(
+                    colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(
+                            selectedFoods.contains(name) ? 0.8 : 0.2),
+                        BlendMode.dstATop),
+                    image: AssetImage(
+                      "assets/images/$name.jpg",
+                    ),
+                    fit: BoxFit.cover)),
+            child: Center(
+              child: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: selectedFoods.contains(name)
+                      ? Colors.white
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.all(Radius.circular(100)),
+                ),
+                child: Center(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                        color: selectedFoods.contains(name)
+                            ? Colors.black
+                            : Colors.white54),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
             )),
-            backgroundColor: MaterialStateProperty.all(color)),
       ),
     );
   }
 
-  Expanded mealOption(String meal) {
+  Expanded foodBoxOption(
+      String name, double height, String selectedName, String category) {
     return Expanded(
-        flex: (selectedMeal == meal) ? 4 : 2,
+        flex: (selectedName == name) ? 4 : 2,
         child: GestureDetector(
           child: Container(
-            height: 200,
+            height: (selectedName == name) ? height : 30,
             decoration: BoxDecoration(
                 color: Colors.black,
+                borderRadius: BorderRadius.all(
+                    Radius.circular((selectedName == name) ? 0 : 0)),
                 image: DecorationImage(
                     colorFilter: ColorFilter.mode(
                         Colors.black
-                            .withOpacity(selectedMeal == meal ? 0.8 : 0.2),
+                            .withOpacity(selectedName == name ? 0.7 : 0.2),
                         BlendMode.dstATop),
                     image: AssetImage(
-                      "assets/images/$meal.jpg",
+                      "assets/images/$name.jpg",
                     ),
                     fit: BoxFit.cover)),
             child: Center(
               child: Text(
-                meal,
+                selectedName == name ? name.toUpperCase() : name,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
                     color:
-                        selectedMeal == meal ? Colors.white : Colors.white70),
+                        selectedName == name ? Colors.white : Colors.white24),
               ),
             ),
           ),
           onTap: () {
             setState(() {
-              selectedMeal = meal;
+              if (category == 'meal') {
+                selectedMeal = name;
+              } else if (category == 'group') {
+                selectedGroup = name;
+                types = widget.foodTypes[name];
+                selectedType = widget.foodTypes[name][0];
+                print(selectedType);
+              } else {
+                selectedType = name;
+              }
             });
-            print(meal);
+            print(name);
           },
         ));
   }
