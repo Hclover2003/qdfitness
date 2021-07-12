@@ -19,7 +19,7 @@ void main() async {
       create: (_) => ThemeNotifier(inkTheme), child: MyApp()));
 }
 
-//root widget
+//root widgetgit
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
