@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +8,7 @@ import 'package:qdfitness/screens/home/diary.dart';
 import 'package:qdfitness/screens/home/home.dart';
 import 'package:qdfitness/screens/home/log.dart';
 import 'package:qdfitness/screens/home/logfood.dart';
+import 'package:qdfitness/screens/home/showmenu.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/theme_notifier.dart';
 import '../../shared/shared.dart';
@@ -26,7 +28,12 @@ class _AppPageState extends State<AppPage> {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return StreamProvider<UserData>.value(
-      initialData: UserData(uid: '0', name: 'guest'),
+      initialData: UserData(
+          uid: '0',
+          name: 'guest',
+          createdAt: Timestamp.now(),
+          dailyExercise: 0,
+          dailyFood: 0),
       value: DatabaseService(uid: user.uid).userData,
       //exit keyboard focus when press elsewhere on screen
       child: GestureDetector(

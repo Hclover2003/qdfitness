@@ -13,6 +13,13 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userdata = Provider.of<UserData>(context);
+    double metabolism = userdata.weight != null
+        ? (-1) *
+            (447.593 +
+                (0.246 * userdata.weight) +
+                (3.098 * userdata.height) -
+                (4.33 * userdata.age.toDouble()))
+        : 14;
     DateTime now = DateTime.now();
     String currenttime = DateFormat.jm().format(now);
     String currentdate = DateFormat.yMMMMEEEEd().format(now);
@@ -32,17 +39,17 @@ class Home extends StatelessWidget {
               Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
               SummaryRow(
                 name: "Food",
-                cal: '159',
+                cal: userdata.dailyFood,
                 icon: Icons.add,
               ),
               SummaryRow(
                 name: "Exercise",
-                cal: '-12',
+                cal: userdata.dailyExercise,
                 icon: Icons.add,
               ),
               SummaryRow(
                 name: "Metabolism",
-                cal: '-59',
+                cal: metabolism.round(),
                 icon: Icons.edit,
               ),
               Row(
@@ -54,7 +61,10 @@ class Home extends StatelessWidget {
                   )),
                   Expanded(
                       child: Text(
-                    "129 cal",
+                    (userdata.dailyExercise +
+                            userdata.dailyFood +
+                            metabolism.round())
+                        .toString(),
                     style: Theme.of(context).textTheme.headline4,
                   ))
                 ],
@@ -69,7 +79,7 @@ class Home extends StatelessWidget {
 
 class SummaryRow extends StatelessWidget {
   final String name;
-  final String cal;
+  final int cal;
   final IconData icon;
 
   SummaryRow({this.name, this.cal, this.icon});
@@ -81,7 +91,7 @@ class SummaryRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(name)),
-          Expanded(child: Text(cal)),
+          Expanded(child: Text(cal.toString())),
           Expanded(child: Icon(icon))
         ],
       ),

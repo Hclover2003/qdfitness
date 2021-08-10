@@ -14,6 +14,19 @@ class UserData {
   final String uid;
   final String name;
   final Timestamp createdAt;
+  final int dailyFood;
+  final int dailyExercise;
+  final double weight;
+  final double height;
+  final int age;
 
-  UserData({this.uid, this.name, this.createdAt});
+  UserData(
+      {this.uid,
+      this.name,
+      this.createdAt,
+      this.dailyExercise,
+      this.dailyFood,
+      this.weight,
+      this.height,
+      this.age});
 }
