@@ -11,19 +11,15 @@ class CircleItem extends StatefulWidget {
     @required this.food,
     @required this.selectedFoods,
     @required this.selectedMeal,
-    @required this.clearFood,
     @required this.addFood,
     @required this.editFoodNum,
-    @required this.subtractFoodNum,
   }) : super(key: key);
 
   final Food food;
   final List<FoodLog> selectedFoods;
   final String selectedMeal;
-  final ClearFood clearFood;
   final AddFood addFood;
-  final ClearFood editFoodNum;
-  final ClearFood subtractFoodNum;
+  final Function editFoodNum;
 
   @override
   _CircleItemState createState() => _CircleItemState();
@@ -48,6 +44,10 @@ class _CircleItemState extends State<CircleItem> {
     }
   }
 
+  void clearAll() {
+    print(widget.food.name + "will delete");
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
@@ -57,7 +57,7 @@ class _CircleItemState extends State<CircleItem> {
           onTap: () {
             //if food is in list, add one to number of food
             if (foodInList() != null) {
-              widget.editFoodNum(widget.food.name);
+              widget.editFoodNum(widget.food.name, "add");
               setState(() {
                 label = foodInList().num.toString();
               });
@@ -90,10 +90,19 @@ class _CircleItemState extends State<CircleItem> {
                           ? widget.food.name
                           : foodInList().num.toString(),
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white),
                     ),
                   )),
                   decoration: BoxDecoration(
-                      color: Colors.green,
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          colorFilter: foodInList() != null
+                              ? ColorFilter.mode(Colors.black.withOpacity(0.2),
+                                  BlendMode.darken)
+                              : ColorFilter.mode(Colors.black.withOpacity(0.6),
+                                  BlendMode.darken),
+                          image:
+                              AssetImage('assets/img/${widget.food.name}.jpg')),
                       borderRadius: BorderRadius.all(Radius.circular(100)))),
               (() {
                 if (foodInList() == null)
@@ -104,7 +113,7 @@ class _CircleItemState extends State<CircleItem> {
                       right: 0,
                       child: GestureDetector(
                           onTap: () {
-                            widget.clearFood(widget.food.name);
+                            widget.editFoodNum(widget.food.name, "clear");
                           },
                           child: Icon(Icons.delete)));
               }()),
@@ -117,7 +126,7 @@ class _CircleItemState extends State<CircleItem> {
                       left: 0,
                       child: GestureDetector(
                           onTap: () {
-                            widget.subtractFoodNum(widget.food.name);
+                            widget.editFoodNum(widget.food.name, "subtract");
                           },
                           child: Icon(Icons.minimize)));
               }())

@@ -6,7 +6,6 @@ import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/home/circleitem.dart';
 import 'package:qdfitness/services/database.dart';
 
-typedef void ClearFood(String foodname);
 typedef void AddFood(FoodLog food);
 
 class FoodChoices extends StatelessWidget {
@@ -15,26 +14,35 @@ class FoodChoices extends StatelessWidget {
     @required this.selectedGroup,
     @required this.selectedFoods,
     @required this.selectedMeal,
-    @required this.clearFood,
     @required this.addFood,
     @required this.editFoodNum,
     @required this.expanded,
-    @required this.subtractFoodNum,
+    @required this.foodLogs,
   }) : super(key: key);
 
   final String selectedGroup;
   final List<FoodLog> selectedFoods;
+  final List<FoodLog> foodLogs;
   final String selectedMeal;
-  final ClearFood clearFood;
+
   final AddFood addFood;
-  final ClearFood editFoodNum;
-  final ClearFood subtractFoodNum;
+  final Function editFoodNum;
   final bool expanded;
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: user.uid);
+    Map<String, FoodLog> mp = {};
+    for (var item in foodLogs) {
+      if (!mp.containsKey(item.name)) {
+        mp[item.name] = item;
+      }
+    }
+    var filteredList = mp.values.toList();
+    filteredList.sort((a, b) => b.createdat.compareTo(a.createdat));
+    var recentfoodlogs = filteredList.sublist(
+        0, filteredList.length > 12 ? 12 : filteredList.length);
 
     return FutureBuilder<QuerySnapshot>(
       future: _db.foodCollection.get(),
@@ -43,37 +51,46 @@ class FoodChoices extends StatelessWidget {
           return Text("Something went wrong");
         }
         if (!snapshot.hasData) {
-          return Text("loading...");
+          return SizedBox(
+            height: 0.25 * MediaQuery.of(context).size.height,
+          );
         }
         List<Food> foods = snapshot.data.docs
             .map((doc) => Food(
-                name: doc.data()['name'],
+                name: doc['name'],
                 id: doc.id,
-                group: doc.data()['group'],
-                calories: doc.data()['calories'],
-                unit: doc.data()['unit']))
+                group: doc['group'],
+                calories: doc['calories'],
+                unit: doc['unit']))
             .toList();
 
-        return !expanded
-            ? SizedBox()
-            : Expanded(
-                flex: 2,
-                child: Container(
-                  color: Colors.white,
-                  child: GridView.count(crossAxisCount: 3, children: [
-                    for (var food in foods
-                        .where((element) => (element.group == selectedGroup)))
-                      CircleItem(
-                          food: food,
-                          clearFood: clearFood,
-                          addFood: addFood,
-                          subtractFoodNum: subtractFoodNum,
-                          editFoodNum: editFoodNum,
-                          selectedFoods: selectedFoods,
-                          selectedMeal: selectedMeal)
-                  ]),
-                ),
-              );
+        foods.sort((a, b) => a.name.compareTo(b.name));
+
+        return Expanded(
+          flex: 4,
+          child: Container(
+            color: Colors.white,
+            child: GridView.count(crossAxisCount: 3, children: [
+              if (selectedGroup == 'recent')
+                for (var food in recentfoodlogs)
+                  CircleItem(
+                      food: foods
+                          .firstWhere((element) => element.name == food.name),
+                      addFood: addFood,
+                      editFoodNum: editFoodNum,
+                      selectedFoods: selectedFoods,
+                      selectedMeal: selectedMeal),
+              for (var food
+                  in foods.where((element) => (element.group == selectedGroup)))
+                CircleItem(
+                    food: food,
+                    addFood: addFood,
+                    editFoodNum: editFoodNum,
+                    selectedFoods: selectedFoods,
+                    selectedMeal: selectedMeal)
+            ]),
+          ),
+        );
       },
     );
   }

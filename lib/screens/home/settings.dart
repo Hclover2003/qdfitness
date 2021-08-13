@@ -87,6 +87,9 @@ class _SettingsState extends State<Settings> {
                       color: Colors.green[200],
                       borderRadius: BorderRadius.circular(40)),
                   child: TextButton(
+                    onPressed: () {
+                      print("theme");
+                    },
                     child: Text(
                       "save",
                       style: TextStyle(fontSize: 20),

@@ -178,7 +178,7 @@ class _ThemeChangerState extends State<ThemeChanger> {
             ),
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },

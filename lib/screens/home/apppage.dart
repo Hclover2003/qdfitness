@@ -3,12 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
-import 'package:qdfitness/screens/home/background.dart';
-import 'package:qdfitness/screens/home/diary.dart';
 import 'package:qdfitness/screens/home/home.dart';
-import 'package:qdfitness/screens/home/log.dart';
+import 'package:qdfitness/screens/home/logexercise.dart';
 import 'package:qdfitness/screens/home/logfood.dart';
-import 'package:qdfitness/screens/home/showmenu.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/theme_notifier.dart';
 import '../../shared/shared.dart';
@@ -20,7 +17,7 @@ class AppPage extends StatefulWidget {
 
 class _AppPageState extends State<AppPage> {
   int i = 0;
-  var pages = [Home(), LogFood(), Log(), Diary()];
+  var pages = [Home(), LogFood(), LogExercise()];
 
   @override
   Widget build(BuildContext context) {
@@ -85,19 +82,13 @@ class _AppPageState extends State<AppPage> {
                       FontAwesomeIcons.utensils,
                       size: 20,
                     ),
-                    label: 'logfood'),
+                    label: 'food'),
                 BottomNavigationBarItem(
                     icon: Icon(
                       FontAwesomeIcons.dumbbell,
                       size: 20,
                     ),
-                    label: 'log'),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      FontAwesomeIcons.calendarAlt,
-                      size: 20,
-                    ),
-                    label: 'diary'),
+                    label: 'exercise'),
               ],
               currentIndex: i,
               type: BottomNavigationBarType.fixed,

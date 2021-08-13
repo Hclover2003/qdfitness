@@ -6,7 +6,6 @@ import 'package:qdfitness/models/appuser.dart';
 import 'package:qdfitness/services/auth.dart';
 import 'package:qdfitness/screens/wrapper.dart';
 import 'package:qdfitness/shared/theme_notifier.dart';
-import 'package:qdfitness/shared/themechanger.dart';
 import 'package:qdfitness/shared/theme_values.dart';
 
 //main function

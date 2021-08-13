@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
-import 'package:intl/intl.dart';
 import 'package:qdfitness/screens/menu/aboutus.dart';
 import 'package:qdfitness/shared/extensions.dart';
 
@@ -20,9 +19,8 @@ class Home extends StatelessWidget {
                 (3.098 * userdata.height) -
                 (4.33 * userdata.age.toDouble()))
         : 14;
-    DateTime now = DateTime.now();
-    String currenttime = DateFormat.jm().format(now);
-    String currentdate = DateFormat.yMMMMEEEEd().format(now);
+    // String currenttime = DateFormat.jm().format(DateTime.now());
+    // String currentdate = DateFormat.yMMMMEEEEd().format(now);
 
     return Stack(children: [
       Container(
@@ -36,6 +34,8 @@ class Home extends StatelessWidget {
           margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
           child: Column(
             children: [
+              //TODO: jump to edit page on button click
+              //TODO: change age, target weight, metabolism
               Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
               SummaryRow(
                 name: "Food",
@@ -69,6 +69,8 @@ class Home extends StatelessWidget {
                   ))
                 ],
               ),
+              //TODO: Pie chart of different foodgroup percentages for today
+              //TODO: Line graph of trend for last 7 days
             ],
           ),
         ),

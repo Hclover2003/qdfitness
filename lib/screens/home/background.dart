@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
-  String imgurl;
+  final String imgurl;
   Background({this.imgurl});
 
   @override
