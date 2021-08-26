@@ -1,61 +1,159 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:qdfitness/models/appuser.dart';
+import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/models/notes.dart';
 
 class DatabaseService {
   final String uid;
   DatabaseService({this.uid});
 
-  //collection reference
-  final CollectionReference notesCollection =
-      FirebaseFirestore.instance.collection('notes');
-  final CollectionReference profilesCollection =
+  //collection references
+  final CollectionReference<Map<String, dynamic>> profilesCollection =
       FirebaseFirestore.instance.collection('profiles');
 
-  //update notes data
-  Future<void> updateNoteData(String note, String type, DateTime time) async {
-    return await notesCollection.doc(uid).collection("usernotes").doc().set({
-      'note': note,
-      'createdat': FieldValue.serverTimestamp(),
-      'type': type,
-      'time': Timestamp.fromDate(time)
-    });
+  final CollectionReference<Map<String, dynamic>> summariesCollection =
+      FirebaseFirestore.instance.collection('dailySummaries');
+
+  final CollectionReference<Map<String, dynamic>> foodCollection =
+      FirebaseFirestore.instance.collection('foodData');
+
+  final CollectionReference<Map<String, dynamic>> foodLogCollection =
+      FirebaseFirestore.instance.collection('foodLogs');
+
+//FOODS
+  //get foods
+  Stream<List<Food>> get foods {
+    return foodCollection.snapshots().map(_foodListFromSnapshot);
   }
 
-  // get notes stream
-  Stream<List<Note>> get notes {
-    return notesCollection
-        .doc(uid)
-        .collection("usernotes")
-        .snapshots()
-        .map(_noteListFromSnapshot);
-  }
-
-  // noteData from snapshot
-  List<Note> _noteListFromSnapshot(QuerySnapshot snapshot) {
+  List<Food> _foodListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
-      return Note(
-          note: doc.data()['note'],
-          createdat: doc.data()['createdat'],
-          type: doc.data()['type']);
+      return Food(
+          name: doc['name'],
+          id: doc.id,
+          group: doc['group'],
+          calories: doc['calories'],
+          unit: doc['unit']);
     }).toList();
   }
 
-  //update user data
-  Future<void> updateUserData(String name) async {
-    return await profilesCollection.doc(uid).set({'name': name});
+//FOODLOG
+  //create foodlog
+  Future<void> createFoodLog(FoodLog foodlog) async {
+    return await foodLogCollection.doc(uid).collection("userfoodlogs").add({
+      'name': foodlog.name,
+      'createdat': Timestamp.now(),
+      'num': foodlog.num,
+      'meal': foodlog.meal,
+      'unit': foodlog.unit,
+      'calories': foodlog.calories
+    });
   }
 
-  //userData from snapshot
-  UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
-    return UserData(
-      uid: uid,
-      name: snapshot.data()['name'],
-    );
+  //get foodlogs stream
+  Stream<List<FoodLog>> get foodlogs {
+    return foodLogCollection
+        .doc(uid)
+        .collection("userfoodlogs")
+        .snapshots()
+        .map(_foodLogListFromSnapshot);
   }
 
-  //get userData stream
+  List<FoodLog> _foodLogListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return FoodLog(
+          name: doc['name'],
+          num: doc['num'],
+          meal: doc['meal'],
+          calories: doc['calories'],
+          unit: doc['unit'],
+          createdat: doc['createdat'],
+          id: doc.id,
+          saved: true);
+    }).toList();
+  }
+
+  //delete foodlog
+  Future<void> deleteFoodLog(String id) async {
+    return foodLogCollection
+        .doc(uid)
+        .collection("userfoodlogs")
+        .doc(id)
+        .delete()
+        .then((value) => print("item deleted successfully"));
+  }
+
+//USER
+  //update user document details
+  Future<void> createUserData(String name, String uid) async {
+    return await profilesCollection.doc(uid).set({
+      'name': name,
+      'createdAt': Timestamp.now(),
+      'dailyfood': 0,
+      'dailyexercise': 0,
+      'weight': 55.0,
+      'height': 160.0,
+      'age': 18
+    });
+  }
+
+  //get userdata stream
   Stream<UserData> get userData {
     return profilesCollection.doc(uid).snapshots().map(_userDataFromSnapshot);
+  }
+
+  UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
+    return UserData(
+        uid: uid,
+        name: snapshot['name'],
+        createdAt: snapshot['createdAt'],
+        dailyExercise: snapshot['dailyexercise'],
+        dailyFood: snapshot['dailyfood'],
+        weight: snapshot['weight'],
+        height: snapshot['height'],
+        age: snapshot['age']);
+  }
+
+//DAILYSUMMARIES
+  //create summary
+  Future<void> createNewSummary() async {
+    return await summariesCollection
+        .doc(uid)
+        .collection("userdailysummaries")
+        .doc()
+        .set({
+      'date': Timestamp.now(),
+      'food': 0,
+      'exercise': 0,
+      'grain': 0,
+      'veg': 0,
+      'fruit': 0,
+      'dairy': 0,
+      'protein': 0,
+      'other': 0
+    }).then((value) => print("created daily summary"));
+  }
+
+  Stream<List<DailySummary>> get dailysummaries {
+    return summariesCollection
+        .doc(uid)
+        .collection("userdailysummaries")
+        .snapshots()
+        .map(_dailySummaryListFromSnapshot);
+  }
+
+  List<DailySummary> _dailySummaryListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return DailySummary(
+          date: doc['date'].toDate(),
+          food: doc['food'],
+          exercise: doc['exercise'],
+          grain: doc['grain'],
+          veg: doc['veg'],
+          fruit: doc['fruit'],
+          dairy: doc['dairy'],
+          protein: doc['protein'],
+          other: doc['other']);
+    }).toList();
   }
 }

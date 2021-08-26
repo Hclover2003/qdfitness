@@ -9,10 +9,10 @@ class AuthService {
 
   // create user obj based on firebase user; private function
   AppUser _userFromFirebaseUser(User user) {
-    return user != null ? AppUser(uid: user.uid) : null;
+    return user != null ? AppUser(uid: user.uid, dailyCalorieTotal: 0) : null;
   }
 
-  //auth change user stream (get a stream of Users and map each into our own AppUser)
+  //auth change user stream (get a stream of Users(firebase default) and map each into our own AppUser(model))
   Stream<AppUser> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
@@ -46,7 +46,7 @@ class AuthService {
     }
   }
 
-  //register with email & password
+  //register with email & password AND create doc in database
   Future registerWithEmailAndPassword(
       String name, String email, String password) async {
     try {
@@ -54,7 +54,7 @@ class AuthService {
           email: email, password: password);
       User user = result.user;
       //create new document for user with the uid
-      await DatabaseService(uid: user.uid).updateUserData(name);
+      await DatabaseService(uid: user.uid).createUserData(name, user.uid);
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());

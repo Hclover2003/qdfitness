@@ -35,7 +35,7 @@ class _SignInState extends State<SignIn> {
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("assets/images/4.png"),
+                        image: AssetImage("assets/images/cover1.png"),
                         fit: BoxFit.cover)),
               ),
               Center(
@@ -47,16 +47,19 @@ class _SignInState extends State<SignIn> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        //brand logo
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 100, 10, 30),
-                          child: Text('qd fitness diary',
-                              style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  foreground: Paint()..shader = linearGradient,
-                                  fontSize: 50.0,
-                                  fontFamily: 'GlacialIndifference')),
+                        SizedBox(
+                          height: 150,
                         ),
+                        //brand logo
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(10, 100, 10, 30),
+                        //   child: Text('qd fitness diary',
+                        //       style: TextStyle(
+                        //           fontStyle: FontStyle.italic,
+                        //           foreground: Paint()..shader = linearGradient,
+                        //           fontSize: 50.0,
+                        //           fontFamily: 'GlacialIndifference')),
+                        // ),
 
                         //form fields
                         TextFormField(

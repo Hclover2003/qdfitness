@@ -34,7 +34,7 @@ class _RegisterState extends State<Register> {
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("assets/images/2.png"),
+                        image: AssetImage("assets/images/cover2.png"),
                         fit: BoxFit.cover)),
               ),
               Center(
@@ -46,16 +46,19 @@ class _RegisterState extends State<Register> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        //logo
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                          child: Text('qd fitness diary',
-                              style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  foreground: Paint()..shader = linearGradient2,
-                                  fontSize: 50.0,
-                                  fontFamily: 'GlacialIndifference')),
+                        SizedBox(
+                          height: 150,
                         ),
+                        //brand logo
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(10, 100, 10, 30),
+                        //   child: Text('qd fitness diary',
+                        //       style: TextStyle(
+                        //           fontStyle: FontStyle.italic,
+                        //           foreground: Paint()..shader = linearGradient,
+                        //           fontSize: 50.0,
+                        //           fontFamily: 'GlacialIndifference')),
+                        // ),
 
                         //formfields
                         TextFormField(
@@ -63,11 +66,11 @@ class _RegisterState extends State<Register> {
                               hintText: 'name',
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(0, 131, 202, 0.5),
+                                      color: Color.fromRGBO(40, 152, 170, 0.5),
                                       width: 3.0)),
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(0, 131, 202, 1),
+                                      color: Color.fromRGBO(40, 152, 170, 1),
                                       width: 3.0))),
                           validator: (val) => val.isEmpty ? 'enter name' : null,
                           onChanged: (val) {
@@ -102,11 +105,11 @@ class _RegisterState extends State<Register> {
                               hintText: 'password',
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(40, 152, 170, 0.5),
+                                      color: Color.fromRGBO(0, 131, 202, 0.5),
                                       width: 3.0)),
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(40, 152, 170, 1),
+                                      color: Color.fromRGBO(0, 131, 202, 1),
                                       width: 3.0))),
                           validator: (val) => val.length < 6
                               ? 'enter password 6+ chars long'
