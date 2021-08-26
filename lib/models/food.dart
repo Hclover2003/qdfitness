@@ -48,3 +48,32 @@ class FoodLog {
       this.id,
       this.saved});
 }
+
+class DailySummary {
+  DateTime date;
+  int grain;
+  int protein;
+  int fruit;
+  int veg;
+  int dairy;
+  int other;
+  int food;
+  int exercise;
+
+  bool saved;
+  @override
+  String toString() {
+    return "food total: $food /exercise: $exercise/ $date ";
+  }
+
+  DailySummary(
+      {this.food,
+      this.exercise,
+      this.grain,
+      this.fruit,
+      this.veg,
+      this.protein,
+      this.dairy,
+      this.other,
+      this.date});
+}

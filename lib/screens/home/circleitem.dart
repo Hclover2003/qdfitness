@@ -18,7 +18,7 @@ class CircleItem extends StatefulWidget {
   final Food food;
   final List<FoodLog> selectedFoods;
   final String selectedMeal;
-  final AddFood addFood;
+  final Function addFood;
   final Function editFoodNum;
 
   @override

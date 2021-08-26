@@ -1,17 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
+import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/menu/aboutus.dart';
+import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/extensions.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({
     Key key,
   }) : super(key: key);
 
   @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  DailySummary todaySummary;
+  List<DailySummary> recentSummaries;
+  @override
   Widget build(BuildContext context) {
     final userdata = Provider.of<UserData>(context);
+    final DatabaseService _db = DatabaseService(uid: userdata.uid);
+    final dailysummaries = Provider.of<List<DailySummary>>(context);
+
+//create new dailysummary for today if doesn't exist; else, fetch it
+    if (dailysummaries == null) {
+      print("loading...");
+    } else if (dailysummaries.length == 0) {
+      print("no summaries");
+      _db.createNewSummary();
+    } else {
+      print(dailysummaries);
+      var todaysum = dailysummaries.firstWhere(
+          (x) =>
+              (x.date.day == DateTime.now().day) &&
+              (x.date.month == DateTime.now().month) &&
+              (x.date.year == DateTime.now().year),
+          orElse: () => null);
+
+      if (todaysum == null) {
+        print("no summary for today");
+        _db.createNewSummary();
+
+        var todaysum = dailysummaries.where((x) =>
+            (x.date.day == DateTime.now().day) &&
+            (x.date.month == DateTime.now().month) &&
+            (x.date.year == DateTime.now().year));
+      } else {
+        print("today summary exists: $todaySummary");
+        setState(() {
+          todaySummary = todaysum;
+        });
+      }
+    }
+
     double metabolism = userdata.weight != null
         ? (-1) *
             (447.593 +
@@ -39,12 +82,12 @@ class Home extends StatelessWidget {
               Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
               SummaryRow(
                 name: "Food",
-                cal: userdata.dailyFood,
+                cal: todaySummary.food,
                 icon: Icons.add,
               ),
               SummaryRow(
                 name: "Exercise",
-                cal: userdata.dailyExercise,
+                cal: todaySummary.exercise,
                 icon: Icons.add,
               ),
               SummaryRow(
@@ -61,10 +104,7 @@ class Home extends StatelessWidget {
                   )),
                   Expanded(
                       child: Text(
-                    (userdata.dailyExercise +
-                            userdata.dailyFood +
-                            metabolism.round())
-                        .toString(),
+                    "hello",
                     style: Theme.of(context).textTheme.headline4,
                   ))
                 ],

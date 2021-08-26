@@ -8,8 +8,6 @@ import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/home/foodchoices.dart';
 import 'package:qdfitness/services/database.dart';
 
-typedef void AddDelete(String id);
-
 class LogFood extends StatefulWidget {
   //meal and group constants
   final List<String> meals = ['breakfast', 'lunch', 'dinner', 'snacks'];
@@ -30,29 +28,10 @@ class _LogFoodState extends State<LogFood> {
   //initialize selected as breakfast and grain
   String selectedMeal = "breakfast";
   String selectedGroup = "recent";
-
   List<FoodLog> items = [];
-  List<bool> _selections = [false, false, false];
-  List<String> itemsToDelete = [];
-  bool editMode = false;
-  bool expanded = false;
   int tmpCals = 0;
 
-//edit entry
-  void toggleEditMode() {
-    setState(() {
-      editMode = !editMode;
-    });
-  }
-
-//add items to be deleted
-  void addToDelete(String id) {
-    setState(() {
-      itemsToDelete = [...itemsToDelete, id];
-    });
-    print("................the items to be deleted are................");
-    print(itemsToDelete);
-  }
+  List<bool> _selections = [false, false, false];
 
 //add new food log to top of list
   void addFood(FoodLog food) {
@@ -62,17 +41,9 @@ class _LogFoodState extends State<LogFood> {
     });
   }
 
-  void deleteFood(String foodid) {
-    var tmpfood = items.firstWhere((element) => (element.id == foodid));
-    setState(() {
-      items.remove(tmpfood);
-    });
-  }
-
 //add/minus/clear food num & update tmpcals
   void editFoodNum(String food, String type) {
-    var tmpfood =
-        items.firstWhere((element) => (element.name == food && !element.saved));
+    var tmpfood = items.firstWhere((element) => element.name == food);
     if (type == "add") {
       setState(() {
         tmpfood.num += 1;
@@ -100,29 +71,14 @@ class _LogFoodState extends State<LogFood> {
 //delete all unsaved entries, reset tmpcals
   void clearAllSelected() {
     setState(() {
-      items = items.where((element) => element.saved);
+      items = [];
       tmpCals = 0;
     });
   }
 
-  void saveItem(String food, String id) {
-    var tmpfood =
-        items.firstWhere((element) => (element.name == food && !element.saved));
+  void saveItem(String food) {
     setState(() {
-      tmpfood.saved = true;
-      tmpfood.id = id;
-    });
-  }
-
-  Future myFuture;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      final user = Provider.of<UserData>(context, listen: false);
-      final DatabaseService _db = DatabaseService(uid: user.uid);
-      myFuture =
-          _db.foodLogCollection.doc(user.uid).collection("userfoodlogs").get();
+      items.removeWhere((element) => element.name == food);
     });
   }
 
@@ -130,203 +86,160 @@ class _LogFoodState extends State<LogFood> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: user.uid);
+    var dailysums = Provider.of<List<DailySummary>>(context);
+    print(dailysums);
 
-    return FutureBuilder<QuerySnapshot>(
-        future: myFuture,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Text("Something went wrong");
-          }
-          if (!snapshot.hasData) {
-            return Center(child: Text("loading..."));
-          }
-
-          snapshot.data.docs.forEach((doc) {
-            var tmpfood = items.firstWhere((element) => element.id == doc.id,
-                orElse: () => null);
-            final itemdate =
-                DateTime.parse(doc['createdat'].toDate().toString());
-            final itemday =
-                DateTime(itemdate.year, itemdate.month, itemdate.day);
-            final now = DateTime.now();
-            final today = DateTime(now.year, now.month, now.day);
-            if ((tmpfood == null) && (itemday == today)) {
-              items.add(FoodLog(
-                  name: doc['name'],
-                  num: doc['num'],
-                  meal: doc['meal'],
-                  calories: doc['calories'],
-                  unit: doc['unit'],
-                  createdat: doc['createdat'],
-                  id: doc.id,
-                  saved: true));
-            }
-          });
-          items.sort((a, b) => b.createdat.compareTo(a.createdat));
-          var mysum =
-              items.fold(0, (sum, item) => sum + (item.calories * item.num));
-
-          _db.profilesCollection.doc(user.uid).update({'dailyfood': mysum});
-
-          return Column(
-            children: [
-              //calorie number
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                Text(
-                  "/1500",
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                //TODO: daily recommended calorie limit
-                Text(
-                  user.dailyFood.toString(),
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                IconButton(
-                    icon: Icon(Icons.zoom_in),
-                    onPressed: () => showDialog(
-                        context: context,
-                        builder: (BuildContext context) => Dialog(
-                              insetPadding:
-                                  EdgeInsets.fromLTRB(20, 20, 20, 100),
-                              child: Column(
-                                children: [
-                                  Center(
-                                      child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Text(
-                                      "543 Cals",
-                                      style:
-                                          Theme.of(context).textTheme.headline4,
-                                    ),
+    return StreamProvider<List<FoodLog>>.value(
+        initialData: [],
+        value: _db.foodlogs,
+        child: Column(
+          children: [
+            //calorie number
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              Text(
+                "/1500",
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              Text(
+                'nothing',
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              //expand icon
+              IconButton(
+                  icon: Icon(Icons.zoom_in),
+                  onPressed: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) => Dialog(
+                            insetPadding: EdgeInsets.fromLTRB(20, 20, 20, 100),
+                            child: Column(
+                              children: [
+                                Center(
+                                    child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Text(
+                                    "543 Cals",
+                                    style:
+                                        Theme.of(context).textTheme.headline4,
+                                  ),
+                                )),
+                                ToggleButtons(
+                                  children: [
+                                    Icon(Icons.cake),
+                                    Icon(Icons.alarm),
+                                    Icon(Icons.label)
+                                  ],
+                                  isSelected: _selections,
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: SizedBox(
+                                      child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: items.length,
+                                        itemBuilder: (context, i) {
+                                          return ListTile(
+                                            tileColor: items[i].saved
+                                                ? Colors.red[100]
+                                                : Colors.blue[100],
+                                            leading: Text(
+                                                items[i].num.toString() + "x"),
+                                            title: Center(
+                                                child: Text(items[i].name +
+                                                    DateFormat(
+                                                            'yyyy-MM-dd hh:mm')
+                                                        .format(items[i]
+                                                            .createdat
+                                                            .toDate())
+                                                        .toString())),
+                                            trailing: Text((items[i].calories *
+                                                        items[i].num)
+                                                    .toString() +
+                                                " cal"),
+                                          );
+                                        }),
                                   )),
-                                  ToggleButtons(
-                                    children: [
-                                      Icon(Icons.cake),
-                                      Icon(Icons.alarm),
-                                      Icon(Icons.label)
-                                    ],
-                                    isSelected: _selections,
-                                  ),
-                                  Flexible(
-                                    flex: 1,
-                                    child: SizedBox(
-                                        child: Align(
-                                      alignment: Alignment.topCenter,
-                                      child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: items.length,
-                                          itemBuilder: (context, i) {
-                                            return ListTile(
-                                              tileColor: items[i].saved
-                                                  ? Colors.red[100]
-                                                  : Colors.blue[100],
-                                              leading: Text(
-                                                  items[i].num.toString() +
-                                                      "x"),
-                                              title: Center(
-                                                  child: Text(items[i].name +
-                                                      DateFormat(
-                                                              'yyyy-MM-dd hh:mm')
-                                                          .format(items[i]
-                                                              .createdat
-                                                              .toDate())
-                                                          .toString())),
-                                              trailing: Text(
-                                                  (items[i].calories *
-                                                              items[i].num)
-                                                          .toString() +
-                                                      " cal"),
-                                            );
-                                          }),
-                                    )),
-                                  ),
-                                  TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, 'Exit'),
-                                      child: Text('Exit'))
-                                ],
-                              ),
-                            )))
-              ]),
-              //menu
-              Menu(
-                  items: items,
-                  addToDelete: addToDelete,
-                  editMode: editMode,
-                  deleteFood: deleteFood,
-                  clearAllSelected: clearAllSelected,
-                  saveItem: saveItem),
-              //menu options (clear and view)
-
-              //meal
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                for (var i in widget.meals)
-                  Expanded(
-                      child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedMeal = i;
-                            });
-                          },
-                          child: Container(
-                            color: !(selectedMeal == i)
-                                ? Color.fromRGBO(59, 65, 79, 1)
-                                : Colors.white,
-                            height: 50,
-                            child: Center(
-                              child: Text(
-                                i,
-                                style: TextStyle(
-                                    fontWeight: (selectedMeal == i)
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: !(selectedMeal == i)
-                                        ? Colors.white
-                                        : Color.fromRGBO(59, 65, 79, 1)),
-                              ),
+                                ),
+                                TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Exit'),
+                                    child: Text('Exit'))
+                              ],
                             ),
                           )))
-              ]),
-              //food group
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                for (var i in widget.foodGroups)
-                  Expanded(
-                      child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedGroup = i;
-                      });
-                    },
-                    child: Container(
-                      color: Colors.white,
-                      height: 50,
-                      child: Center(
-                        child: Text(
-                          i,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Color.fromRGBO(59, 65, 79, 1),
-                              fontWeight: (selectedGroup == i)
-                                  ? FontWeight.bold
-                                  : FontWeight.normal),
-                        ),
+            ]),
+            //menu
+            Menu(
+                items: items,
+                clearAllSelected: clearAllSelected,
+                saveItem: saveItem),
+            //meal
+            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+              for (var i in widget.meals)
+                Expanded(
+                    child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedMeal = i;
+                          });
+                        },
+                        child: Container(
+                          color: !(selectedMeal == i)
+                              ? Color.fromRGBO(59, 65, 79, 1)
+                              : Colors.white,
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              i,
+                              style: TextStyle(
+                                  fontWeight: (selectedMeal == i)
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: !(selectedMeal == i)
+                                      ? Colors.white
+                                      : Color.fromRGBO(59, 65, 79, 1)),
+                            ),
+                          ),
+                        )))
+            ]),
+            //food group
+            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+              for (var i in widget.foodGroups)
+                Expanded(
+                    child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedGroup = i;
+                    });
+                  },
+                  child: Container(
+                    color: Colors.white,
+                    height: 50,
+                    child: Center(
+                      child: Text(
+                        i,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Color.fromRGBO(59, 65, 79, 1),
+                            fontWeight: (selectedGroup == i)
+                                ? FontWeight.bold
+                                : FontWeight.normal),
                       ),
                     ),
-                  ))
-              ]),
-              //food choices
-              FoodChoices(
-                  addFood: addFood,
-                  expanded: expanded,
-                  editFoodNum: editFoodNum,
-                  selectedGroup: selectedGroup,
-                  foodLogs: items.where((element) => element.saved).toList(),
-                  selectedFoods:
-                      items.where((element) => !element.saved).toList(),
-                  selectedMeal: selectedMeal),
-            ],
-          );
-        });
+                  ),
+                ))
+            ]),
+            //food choices
+            FoodChoices(
+                addFood: addFood,
+                editFoodNum: editFoodNum,
+                selectedGroup: selectedGroup,
+                selectedFoods:
+                    items.where((element) => !element.saved).toList(),
+                selectedMeal: selectedMeal),
+          ],
+        ));
   }
 }
 
@@ -334,20 +247,13 @@ class Menu extends StatefulWidget {
   Menu({
     Key key,
     @required this.items,
-    @required this.editMode,
-    @required this.addToDelete,
     @required this.clearAllSelected,
-    @required this.deleteFood,
     @required this.saveItem,
   }) : super(key: key);
 
   final List<FoodLog> items;
-  final Function addToDelete;
   final Function clearAllSelected;
-  final Function deleteFood;
   final Function saveItem;
-
-  final bool editMode;
 
   @override
   _MenuState createState() => _MenuState();
@@ -358,6 +264,18 @@ class _MenuState extends State<Menu> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: user.uid);
+    var now = DateTime.now();
+    var foodlogs = Provider.of<List<FoodLog>>(context)
+            .where((element) =>
+                DateTime(
+                    DateTime.parse(element.createdat.toDate().toString()).year,
+                    DateTime.parse(element.createdat.toDate().toString()).month,
+                    DateTime.parse(element.createdat.toDate().toString())
+                        .day) ==
+                DateTime(now.year, now.month, now.day))
+            .toList() ??
+        [];
+    foodlogs.sort((a, b) => b.createdat.compareTo(a.createdat));
 
     return Expanded(
       flex: 3,
@@ -371,20 +289,22 @@ class _MenuState extends State<Menu> {
                 alignment: Alignment.topCenter,
                 child: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: widget.items.length,
+                    itemCount: widget.items.length + foodlogs.length,
                     itemBuilder: (context, i) {
+                      var allItems = widget.items.isNotEmpty
+                          ? [...widget.items, ...foodlogs]
+                          : foodlogs;
                       return Dismissible(
                           key: UniqueKey(),
                           onDismissed: (direction) async {
                             if (direction == DismissDirection.startToEnd) {
-                              _db.deleteFoodLog(widget.items[i].id);
-                              // widget.deleteFood(widget.items[i].id);
-
-                              // _db.profilesCollection.doc(user.uid).update({
-                              //   'dailyfood': FieldValue.increment(-1 *
-                              //       widget.items[i].calories *
-                              //       widget.items[i].num)
-                              // });
+                              var item = allItems[i];
+                              print(item.id);
+                              _db.profilesCollection.doc(user.uid).update({
+                                'dailyfood': FieldValue.increment(
+                                    -1 * item.calories * item.num)
+                              });
+                              _db.deleteFoodLog(item.id);
                             }
                           },
                           confirmDismiss: (DismissDirection direction) async {
@@ -419,9 +339,8 @@ class _MenuState extends State<Menu> {
                           ),
                           secondaryBackground: Container(color: Colors.green),
                           child: FoodLogTile(
-                              item: widget.items[i],
-                              addToDelete: widget.addToDelete,
-                              editMode: widget.editMode));
+                            item: allItems[i],
+                          ));
                     }),
               )),
             ),
@@ -453,11 +372,10 @@ class _MenuState extends State<Menu> {
                 Expanded(
                     child: TextButton(
                         onPressed: () async {
-                          var saveFoodLogs = widget.items
-                              .where((element) => !element.saved)
-                              .toList();
+                          var saveFoodLogs = []..addAll(widget.items);
                           for (FoodLog foodlog in saveFoodLogs) {
-                            await _db.foodLogCollection
+                            widget.saveItem(foodlog.name);
+                            _db.foodLogCollection
                                 .doc(user.uid)
                                 .collection("userfoodlogs")
                                 .add({
@@ -467,11 +385,10 @@ class _MenuState extends State<Menu> {
                               'meal': foodlog.meal,
                               'unit': foodlog.unit,
                               'calories': foodlog.calories
-                            }).then((doc) =>
-                                    widget.saveItem(foodlog.name, doc.id));
+                            });
                           }
                           _db.profilesCollection.doc(user.uid).update({
-                            'dailyfood': FieldValue.increment(saveFoodLogs.fold(
+                            'dailyfood': FieldValue.increment(widget.items.fold(
                                 0,
                                 (sum, item) =>
                                     sum + (item.calories * item.num)))
@@ -509,16 +426,12 @@ class _MenuState extends State<Menu> {
 }
 
 class FoodLogTile extends StatefulWidget {
-  const FoodLogTile(
-      {Key key,
-      @required this.item,
-      @required this.addToDelete,
-      @required this.editMode})
-      : super(key: key);
+  const FoodLogTile({
+    Key key,
+    @required this.item,
+  }) : super(key: key);
 
   final FoodLog item;
-  final Function addToDelete;
-  final bool editMode;
 
   @override
   _FoodLogTileState createState() => _FoodLogTileState();
@@ -546,14 +459,6 @@ class _FoodLogTileState extends State<FoodLogTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        if (widget.editMode) {
-          setState(() {
-            isSelected = !isSelected;
-            mycolor = isSelected ? Colors.pink[300] : Colors.red[100];
-          });
-        }
-      },
       tileColor: mycolor,
       leading: Text(widget.item.num.toString() + "x"),
       title: Center(child: Text(widget.item.name)),

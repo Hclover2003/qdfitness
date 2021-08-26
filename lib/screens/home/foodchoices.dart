@@ -6,8 +6,6 @@ import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/home/circleitem.dart';
 import 'package:qdfitness/services/database.dart';
 
-typedef void AddFood(FoodLog food);
-
 class FoodChoices extends StatelessWidget {
   const FoodChoices({
     Key key,
@@ -16,25 +14,22 @@ class FoodChoices extends StatelessWidget {
     @required this.selectedMeal,
     @required this.addFood,
     @required this.editFoodNum,
-    @required this.expanded,
-    @required this.foodLogs,
   }) : super(key: key);
 
   final String selectedGroup;
   final List<FoodLog> selectedFoods;
-  final List<FoodLog> foodLogs;
   final String selectedMeal;
-
-  final AddFood addFood;
+  final Function addFood;
   final Function editFoodNum;
-  final bool expanded;
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: user.uid);
+    var foodlogs = Provider.of<List<FoodLog>>(context);
+
     Map<String, FoodLog> mp = {};
-    for (var item in foodLogs) {
+    for (var item in foodlogs) {
       if (!mp.containsKey(item.name)) {
         mp[item.name] = item;
       }
