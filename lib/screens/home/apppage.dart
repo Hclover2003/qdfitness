@@ -15,7 +15,7 @@ class _AppPageState extends State<AppPage> {
   Widget build(BuildContext context) {
     final user = Provider.of<AppUser>(context);
     return StreamProvider<List<DailySummary>>.value(
-        initialData: null,
+        initialData: [],
         value: DatabaseService(uid: user.uid).dailysummaries,
         catchError: (_, __) => null,
 

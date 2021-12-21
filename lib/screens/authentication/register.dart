@@ -49,18 +49,6 @@ class _RegisterState extends State<Register> {
                         SizedBox(
                           height: 150,
                         ),
-                        //brand logo
-                        // Padding(
-                        //   padding: const EdgeInsets.fromLTRB(10, 100, 10, 30),
-                        //   child: Text('qd fitness diary',
-                        //       style: TextStyle(
-                        //           fontStyle: FontStyle.italic,
-                        //           foreground: Paint()..shader = linearGradient,
-                        //           fontSize: 50.0,
-                        //           fontFamily: 'GlacialIndifference')),
-                        // ),
-
-                        //formfields
                         TextFormField(
                           decoration: textInputDecoration.copyWith(
                               hintText: 'name',

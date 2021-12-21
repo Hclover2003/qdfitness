@@ -59,6 +59,7 @@ class DailySummary {
   int other;
   int food;
   int exercise;
+  String id;
 
   bool saved;
   @override
@@ -75,5 +76,6 @@ class DailySummary {
       this.protein,
       this.dairy,
       this.other,
-      this.date});
+      this.date,
+      this.id});
 }

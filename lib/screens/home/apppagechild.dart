@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:qdfitness/models/appuser.dart';
 import 'package:qdfitness/screens/home/home.dart';
 import 'package:qdfitness/screens/home/logexercise.dart';
 import 'package:qdfitness/screens/home/logfood.dart';
@@ -23,9 +22,7 @@ class _AppPageChildState extends State<AppPageChild> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        //don't resize with onscreen keyboard
         resizeToAvoidBottomInset: false,
-        //appbar
         appBar: AppBar(
           backgroundColor: Theme.of(context).backgroundColor,
           elevation: 0,
@@ -45,11 +42,7 @@ class _AppPageChildState extends State<AppPageChild> {
             )
           ],
         ),
-
-        //side menu
         drawer: UpperDrawer(),
-
-        //bottom options
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
               canvasColor: Theme.of(context).primaryColor,

@@ -153,7 +153,8 @@ class DatabaseService {
           fruit: doc['fruit'],
           dairy: doc['dairy'],
           protein: doc['protein'],
-          other: doc['other']);
+          other: doc['other'],
+          id: doc.id);
     }).toList();
   }
 }

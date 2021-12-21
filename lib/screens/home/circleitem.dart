@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qdfitness/models/appuser.dart';
 import 'package:qdfitness/models/food.dart';
-import 'package:qdfitness/screens/home/foodchoices.dart';
 
 class CircleItem extends StatefulWidget {
   const CircleItem({
@@ -18,6 +17,7 @@ class CircleItem extends StatefulWidget {
   final Food food;
   final List<FoodLog> selectedFoods;
   final String selectedMeal;
+  
   final Function addFood;
   final Function editFoodNum;
 

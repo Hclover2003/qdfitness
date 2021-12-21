@@ -19,6 +19,7 @@ class FoodChoices extends StatelessWidget {
   final String selectedGroup;
   final List<FoodLog> selectedFoods;
   final String selectedMeal;
+  
   final Function addFood;
   final Function editFoodNum;
 

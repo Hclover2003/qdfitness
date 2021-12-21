@@ -8,22 +8,21 @@ import 'package:qdfitness/screens/wrapper.dart';
 import 'package:qdfitness/shared/theme_notifier.dart';
 import 'package:qdfitness/shared/theme_values.dart';
 
-//main function
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  //wrap myapp in provider
   runApp(ChangeNotifierProvider<ThemeNotifier>(
       create: (_) => ThemeNotifier(inkTheme), child: MyApp()));
 }
 
-//root widgetgit
+//root widget
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //get theme with themenotifier
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    
     //appuser is the type of data we are listening to, user is the variable name of the stream
     return StreamProvider<AppUser>.value(
       initialData: null,
