@@ -13,6 +13,7 @@ import 'package:qdfitness/shared/constantfns.dart';
 class LogFood extends StatefulWidget {
   //meal and group constants
   final List<String> meals = ['breakfast', 'lunch', 'dinner', 'snacks'];
+  //TODO: custom food option
   final List<String> foodGroups = [
     'recent',
     'grain',
@@ -36,6 +37,7 @@ class _LogFoodState extends State<LogFood> {
   List<FoodLog> items = [];
   int tmpCals = 0;
   
+  //TODO: sort detailed popup menu by meal, number of calories, time
   List<bool> _selections = [false, false, false];
 
 //add new food log to top of list
@@ -83,6 +85,7 @@ class _LogFoodState extends State<LogFood> {
       tmpCals = 0;
     });
   }
+
 //remove the element from items for this session (since it is now saved)
   void saveItem(FoodLog food) {
     setState(() {
@@ -94,6 +97,7 @@ class _LogFoodState extends State<LogFood> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: user.uid);
+    //FIXME: how to make async? sometimes too slow, creates new summary
     var dailysummaries = Provider.of<List<DailySummary>>(context);
     setState(() {
       todaysummary = getTodaySummary(dailysummaries);
@@ -106,7 +110,7 @@ class _LogFoodState extends State<LogFood> {
         value: _db.foodlogs,
         child: Column(
           children: [
-            //calorie number
+            //calorie number and zoomin icons (popup menu)
             Container(
               color: Theme.of(context).backgroundColor,
               child: Padding(
@@ -121,6 +125,7 @@ class _LogFoodState extends State<LogFood> {
                     style: Theme.of(context).textTheme.headline4,
                   ),
                   //expand icon
+                  //FIXME: streamprovider is scoped (cannot access db.foodlogs)
                   IconButton(
                       icon: Icon(Icons.zoom_in),
                       onPressed: () {
@@ -191,42 +196,58 @@ class _LogFoodState extends State<LogFood> {
                 ]),
               ),
             ),
-            //menu
+            
+            //stationary menu
             Menu(
                 items: items,
                 clearAllSelected: clearAllSelected,
                 saveItem: saveItem,
                 todaySummary: todaysummary,),
-            //meal
-            Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              for (var i in widget.meals)
-                Expanded(
-                    child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedMeal = i;
-                          });
-                        },
-                        child: Container(
-                          color: !(selectedMeal == i)
-                              ? Color.fromRGBO(59, 65, 79, 1)
-                              : Colors.white,
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              i,
-                              style: TextStyle(
-                                  fontWeight: (selectedMeal == i)
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: !(selectedMeal == i)
-                                      ? Colors.white
-                                      : Color.fromRGBO(59, 65, 79, 1)),
+            
+            //choose meal
+            Container(
+              decoration: BoxDecoration(
+                          gradient: new LinearGradient(
+                              colors: [
+                                Colors.yellow[500],
+                                Colors.yellow[900],
+                              ],
+                              begin: const FractionalOffset(0.0, 0.0),
+                              end: const FractionalOffset(1.0, 1.00),
+                              stops: [0.0, 1.0],
+                              tileMode: TileMode.clamp),
+                        ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                for (var i in widget.meals)
+                  Expanded(
+                      child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedMeal = i;
+                            });
+                          },
+                          child: Container(
+                            color: !(selectedMeal == i)
+                                ?Colors.transparent
+                                : Colors.white,
+                            height: 50,
+                            child: Center(
+                              child: Text(
+                                i,
+                                style: TextStyle(
+                                    fontWeight: (selectedMeal == i)
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: !(selectedMeal == i)
+                                        ? Colors.white
+                                        : Color.fromRGBO(59, 65, 79, 1)),
+                              ),
                             ),
-                          ),
-                        )))
-            ]),
-            //food group
+                          )))
+              ]),
+            ),
+            
+            //choose food group
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               for (var i in widget.foodGroups)
                 Expanded(
@@ -253,7 +274,8 @@ class _LogFoodState extends State<LogFood> {
                   ),
                 ))
             ]),
-            //food choices
+            
+            //gallary of food choices
             FoodChoices(
                 addFood: addFood,
                 editFoodNum: editFoodNum,
@@ -266,6 +288,7 @@ class _LogFoodState extends State<LogFood> {
   }
 }
 
+//stationary menu
 class Menu extends StatefulWidget {
   Menu({
     Key key,
@@ -449,6 +472,8 @@ class _MenuState extends State<Menu> {
   }
 }
 
+
+//foodlog tile in menu
 class FoodLogTile extends StatefulWidget {
   const FoodLogTile({
     Key key,
@@ -464,10 +489,27 @@ class FoodLogTile extends StatefulWidget {
 class _FoodLogTileState extends State<FoodLogTile> {
   bool isSelected = false;
   Color mycolor;
+  Color mealcolor;
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      switch(widget.item.meal){
+          case 'breakfast':
+            mealcolor = Colors.yellow[100];
+            break;
+          case 'lunch':
+          mealcolor = Colors.yellow[400];
+            break;
+          case 'dinner':
+          mealcolor = Colors.yellow[700];
+            break;
+          case 'snacks':
+          mealcolor = Colors.yellow[900];
+            break;
+        }
+    });
 
     if (widget.item.saved) {
       setState(() {
@@ -483,8 +525,8 @@ class _FoodLogTileState extends State<FoodLogTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor: mycolor,
-      leading: Text(widget.item.num.toString() + "x"),
+      tileColor: (mycolor),
+      leading: Container(height:50, width: 50, color: mealcolor, child: Align(alignment: Alignment.center, child: Text(widget.item.num.toString() + "x", textAlign: TextAlign.center,))),
       title: Center(child: Text(widget.item.name)),
       trailing:
           Text((widget.item.calories * widget.item.num).toString() + " cal"),

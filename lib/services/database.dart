@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:qdfitness/models/appuser.dart';
+import 'package:qdfitness/models/exercise.dart';
 import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/models/notes.dart';
 
@@ -19,6 +20,12 @@ class DatabaseService {
 
   final CollectionReference<Map<String, dynamic>> foodLogCollection =
       FirebaseFirestore.instance.collection('foodLogs');
+
+      final CollectionReference<Map<String, dynamic>> exerciseCollection =
+      FirebaseFirestore.instance.collection('exerciseData');
+
+  final CollectionReference<Map<String, dynamic>> exerciseLogCollection =
+      FirebaseFirestore.instance.collection('exerciseLogs');
 
 //FOODS
   //get foods
@@ -157,4 +164,47 @@ class DatabaseService {
           id: doc.id);
     }).toList();
   }
+
+  //EXERCISELOG
+  //create exerciselog
+  Future<void> createExerciseLog(ExerciseLog exerciselog) async {
+    return await exerciseLogCollection.doc(uid).collection("userexerciselogs").add({
+      'name': exerciselog.name,
+      'createdat': Timestamp.now(),
+      'hours': exerciselog.hours,
+      'calories': exerciselog.calories
+    });
+  }
+
+  //get exerciselogs stream
+  Stream<List<ExerciseLog>> get exerciselogs {
+    return exerciseLogCollection
+        .doc(uid)
+        .collection("userexerciselogs")
+        .snapshots()
+        .map(_exerciseLogListFromSnapshot);
+  }
+
+  List<ExerciseLog> _exerciseLogListFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      return ExerciseLog(
+          name: doc['name'],
+          hours: doc['hours'],
+          calories: doc['calories'],
+          createdat: doc['createdat'],
+          id: doc.id,
+          saved: true);
+    }).toList();
+  }
+
+  //delete exerciseLog
+  Future<void> deleteExerciseLog(String id) async {
+    return exerciseLogCollection
+        .doc(uid)
+        .collection("userexerciselogs")
+        .doc(id)
+        .delete()
+        .then((value) => print("item deleted successfully"));
+  }
 }
+

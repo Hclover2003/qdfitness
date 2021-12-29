@@ -9,6 +9,7 @@ import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/constantfns.dart';
 import 'package:qdfitness/shared/extensions.dart';
 
+//home page
 class Home extends StatefulWidget {
   const Home({
     Key key,
@@ -22,12 +23,14 @@ class _HomeState extends State<Home> {
   DailySummary todaySummary;
   List<DailySummary> recentSummaries;
   List<WeekData> weekdata;
+
   @override
   Widget build(BuildContext context) {
     final userdata = Provider.of<UserData>(context);
     final DatabaseService _db = DatabaseService(uid: userdata.uid);
     final dailysummaries = Provider.of<List<DailySummary>>(context);
 
+    //FIXME: sometimes create new summary even if summary exists
     //check summaries, see if today summary exists. If not, create one
     if (dailysummaries == null) {
       if (DateTime.parse(userdata.createdAt.toDate().toString())
@@ -52,7 +55,6 @@ class _HomeState extends State<Home> {
         });
       }
     }
-
     dailysummaries.sort((b, a) => a.date.compareTo(b.date));
     var weekago = DateTime.now().subtract(Duration(days: 7));
     setState(() {
@@ -66,7 +68,6 @@ class _HomeState extends State<Home> {
               i.food.toDouble(), i.exercise.toDouble()))
           .toList();
     });
-
     double metabolism = userdata.weight != null
         ? (-1) *
             (447.593 +
@@ -77,10 +78,13 @@ class _HomeState extends State<Home> {
     // String currenttime = DateFormat.jm().format(DateTime.now());
     // String currentdate = DateFormat.yMMMMEEEEd().format(now);
 
+    //return loading if fetching today's summary
     return (todaySummary == null)
+        //FIXME: better loading screen
         ? Text("Loading...")
         : SingleChildScrollView(
-          child: Stack(children: [
+            child: Stack(children: [
+              //FIXME: better background image
               Container(
                 decoration: BoxDecoration(
                     image: DecorationImage(
@@ -93,7 +97,7 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       //TODO: jump to edit page on button click
-                      //TODO: change age, target weight, metabolism
+                      //TODO: change age, height, weight, gender (used to calculate BMR)
                       Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
                       SummaryRow(
                         name: "Food",
@@ -141,10 +145,11 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ]),
-        );
+          );
   }
 }
 
+//one row in home page
 class SummaryRow extends StatelessWidget {
   final String name;
   final int cal;
@@ -161,9 +166,13 @@ class SummaryRow extends StatelessWidget {
         children: [
           Expanded(child: Text(name)),
           Expanded(child: Center(child: Text(cal.toString()))),
-          Expanded(child: IconButton(icon: Icon(icon), onPressed: (){
-            print("metabolism edit...");
-          },))
+          Expanded(
+              child: IconButton(
+            icon: Icon(icon),
+            onPressed: () {
+              print("metabolism edit...");
+            },
+          ))
         ],
       ),
     );
