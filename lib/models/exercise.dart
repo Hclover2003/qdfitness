@@ -24,10 +24,10 @@ class Exercise {
   Map<String, dynamic> _toMap() {
     return {
       'light': light,
-      'verylight': veryLight,
+      'veryLight': veryLight,
       'moderate': moderate,
       'intense': intense,
-      'veryintense': veryIntense
+      'veryIntense': veryIntense
     };
   }
 

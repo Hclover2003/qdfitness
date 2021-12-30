@@ -12,6 +12,7 @@ class ExerciseChoices extends StatelessWidget {
     @required this.selectedGroup,
     @required this.selectedLevel,
     @required this.selectedExercise,
+    @required this.selectedActivity,
     @required this.selectedHours,
     @required this.updateExercise,
   }) : super(key: key);
@@ -19,6 +20,8 @@ class ExerciseChoices extends StatelessWidget {
   final String selectedGroup;
   final String selectedLevel;
   final String selectedExercise;
+  final Exercise selectedActivity;
+
   final double selectedHours;
   final Function updateExercise;
 
@@ -78,6 +81,7 @@ class ExerciseChoices extends StatelessWidget {
                           (element) => element.name == exercise.name),
                       updateExercise: updateExercise,
                       selectedExercise: selectedExercise,
+                      selectedActivity: selectedActivity,
                       selectedLevel: selectedLevel),
               for (var exercise in exercises
                   .where((element) => (element.group == selectedGroup)))
@@ -86,6 +90,7 @@ class ExerciseChoices extends StatelessWidget {
                         .firstWhere((element) => element.name == exercise.name),
                     updateExercise: updateExercise,
                     selectedExercise: selectedExercise,
+                    selectedActivity: selectedActivity,
                     selectedLevel: selectedLevel),
             ]),
           ),

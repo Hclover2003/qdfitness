@@ -10,14 +10,14 @@ class CircleItemExercise extends StatefulWidget {
     @required this.exercise,
     @required this.selectedExercise,
     @required this.selectedLevel,
-    @required this.selectedHours,
+    @required this.selectedActivity,
     @required this.updateExercise,
   }) : super(key: key);
 
   final Exercise exercise;
   final String selectedExercise;
   final String selectedLevel;
-  final double selectedHours;
+  final Exercise selectedActivity;
   final Function updateExercise;
 
   @override
@@ -40,17 +40,11 @@ class _CircleItemExerciseState extends State<CircleItemExercise> {
         padding: const EdgeInsets.all(14.0),
         child: GestureDetector(
           onTap: () {
-            //if food is in list, add one to number of food
-            if (widget.exercise.name == widget.selectedExercise) {
-              print("already selected");
-              //if it isn't, add it and change label to 1
-            } else {
-              widget.updateExercise(widget.exercise);
-            }
+            widget.updateExercise(widget.exercise);
           },
           child: Tooltip(
             message:
-                "${widget.exercise.name} : ${(widget.exercise.get(widget.selectedLevel) * weight).toInt()} cal/h",
+                "${widget.exercise.name} : ${(widget.exercise.get(widget.selectedLevel) * weight).toInt()} cal/h ",
             child: Stack(children: [
               Container(
                   child: Center(

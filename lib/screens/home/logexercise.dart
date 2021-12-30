@@ -9,7 +9,7 @@ import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/home/exercisechoices.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/constantfns.dart';
-import 'package:qdfitness/shared/customsliderthumbcircle.dart';
+import 'dart:math';
 
 class LogExercise extends StatefulWidget {
   //meal and group constants
@@ -44,8 +44,10 @@ class _LogExerciseState extends State<LogExercise> {
   String selectedGroup = "recent";
   String selectedLevel = "moderate";
   String selectedExercise;
+  Exercise selectedActivity;
   double selectedHours = 0.5;
   int selectedCalories = 0;
+  double metvalue = 0;
   double weight = 55.6;
 
   ExerciseLog newExerciseLog;
@@ -60,6 +62,7 @@ class _LogExerciseState extends State<LogExercise> {
     print(exercise.get(selectedLevel));
     setState(() {
       selectedExercise = exercise.name;
+      selectedActivity = exercise;
       selectedCalories =
           (weight * exercise.get(selectedLevel) * selectedHours).toInt();
     });
@@ -70,6 +73,12 @@ class _LogExerciseState extends State<LogExercise> {
     setState(() {
       selectedExercise = null;
       tmpCals = 0;
+    });
+  }
+
+  void updateHours(double hours) {
+    setState(() {
+      selectedHours = hours;
     });
   }
 
@@ -101,7 +110,7 @@ class _LogExerciseState extends State<LogExercise> {
                         style: Theme.of(context).textTheme.headline6,
                       ),
                       Text(
-                        (todaysummary.food + tmpCals).toString() + " cal",
+                        (todaysummary.exercise + tmpCals).toString() + " cal",
                         style: Theme.of(context).textTheme.headline4,
                       ),
                       //expand icon
@@ -191,7 +200,14 @@ class _LogExerciseState extends State<LogExercise> {
               children: [
                 Text(selectedHours.toString() ?? "null"),
                 Text(selectedExercise ?? "null"),
-                Text(selectedCalories.toString() ?? "null")
+                Text(selectedActivity != null
+                    ? (weight *
+                                selectedActivity.get(selectedLevel) *
+                                selectedHours)
+                            .toInt()
+                            .toString() ??
+                        "null"
+                    : "nothing")
               ],
             ),
             //menu
@@ -199,7 +215,12 @@ class _LogExerciseState extends State<LogExercise> {
               newExerciseLog: ExerciseLog(
                   hours: selectedHours,
                   name: selectedExercise,
-                  calories: selectedCalories,
+                  calories: selectedActivity != null
+                      ? (weight *
+                              selectedActivity.get(selectedLevel) *
+                              selectedHours)
+                          .toInt()
+                      : null,
                   saved: false),
               saveItem: saveItem,
               todaySummary: todaysummary,
@@ -231,73 +252,113 @@ class _LogExerciseState extends State<LogExercise> {
                           children: [
                             Radio<Level>(
                               fillColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
+                                  (states) => selectedActivity == null
+                                      ? Colors.white
+                                      : selectedActivity.veryLight == 0
+                                          ? Colors.blueGrey[300]
+                                          : Colors.white),
                               focusColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.white),
                               value: Level.veryLight,
                               groupValue: _level,
-                              onChanged: (Level level) {
-                                setState(() {
-                                  _level = level;
-                                  selectedLevel = "veryLight";
-                                });
-                              },
+                              onChanged: selectedActivity == null
+                                  ? null
+                                  : selectedActivity.veryLight == 0
+                                      ? null
+                                      : (Level level) {
+                                          setState(() {
+                                            _level = level;
+                                            selectedLevel = "veryLight";
+                                          });
+                                        },
                             ),
                             Radio<Level>(
                               fillColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
+                                  (states) => selectedActivity == null
+                                      ? Colors.white
+                                      : selectedActivity.light == 0
+                                          ? Colors.blueGrey[300]
+                                          : Colors.white),
                               focusColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.white),
                               value: Level.light,
                               groupValue: _level,
-                              onChanged: (Level level) {
-                                setState(() {
-                                  _level = level;
-                                  selectedLevel = "light";
-                                });
-                              },
+                              onChanged: selectedActivity == null
+                                  ? null
+                                  : selectedActivity.light == 0
+                                      ? null
+                                      : (Level level) {
+                                          setState(() {
+                                            _level = level;
+                                            selectedLevel = "light";
+                                          });
+                                        },
                             ),
                             Radio<Level>(
                               fillColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
+                                  (states) => selectedActivity == null
+                                      ? Colors.white
+                                      : selectedActivity.moderate == 0
+                                          ? Colors.blueGrey[300]
+                                          : Colors.white),
                               focusColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.white),
                               value: Level.moderate,
                               groupValue: _level,
-                              onChanged: (Level level) {
-                                setState(() {
-                                  _level = level;
-                                  selectedLevel = "moderate";
-                                });
-                              },
+                              onChanged: selectedActivity == null
+                                  ? null
+                                  : selectedActivity.moderate == 0
+                                      ? null
+                                      : (Level level) {
+                                          setState(() {
+                                            _level = level;
+                                            selectedLevel = "moderate";
+                                          });
+                                        },
                             ),
                             Radio<Level>(
                               fillColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
+                                  (states) => selectedActivity == null
+                                      ? Colors.white
+                                      : selectedActivity.intense == 0
+                                          ? Colors.blueGrey[300]
+                                          : Colors.white),
                               focusColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.white),
                               value: Level.intense,
                               groupValue: _level,
-                              onChanged: (Level level) {
-                                setState(() {
-                                  _level = level;
-                                  selectedLevel = "intense";
-                                });
-                              },
+                              onChanged: selectedActivity == null
+                                  ? null
+                                  : selectedActivity.intense == 0
+                                      ? null
+                                      : (Level level) {
+                                          setState(() {
+                                            _level = level;
+                                            selectedLevel = "intense";
+                                          });
+                                        },
                             ),
                             Radio<Level>(
                               fillColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
+                                  (states) => selectedActivity == null
+                                      ? Colors.white
+                                      : selectedActivity.veryIntense == 0
+                                          ? Colors.blueGrey[300]
+                                          : Colors.white),
                               focusColor: MaterialStateColor.resolveWith(
                                   (states) => Colors.white),
                               value: Level.veryIntense,
                               groupValue: _level,
-                              onChanged: (Level level) {
-                                setState(() {
-                                  _level = level;
-                                  selectedLevel = "veryIntense";
-                                });
-                              },
+                              onChanged: selectedActivity == null
+                                  ? null
+                                  : selectedActivity.veryIntense == 0
+                                      ? null
+                                      : (Level level) {
+                                          setState(() {
+                                            _level = level;
+                                            selectedLevel = "veryIntense";
+                                          });
+                                        },
                             )
                           ],
                         ),
@@ -331,33 +392,139 @@ class _LogExerciseState extends State<LogExercise> {
                         // ),
                       ),
                     ),
-                    Flexible(
-                        flex: 1,
-                        child: Container(
-                            height: 48,
-                            color: const Color(0xFF0072ff),
-                            child: TextFormField(
-                                decoration:
-                                    InputDecoration(border: InputBorder.none),
-                                textAlign: TextAlign.right,
-                                initialValue: _currentIntValue.toString(),
-                                keyboardType: TextInputType.number,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18)))),
+                    // Flexible(
+                    //     flex: 1,
+                    //     child: Container(
+                    //         height: 48,
+                    //         color: const Color(0xFF0072ff),
+                    //         child: TextFormField(
+                    //             decoration:
+                    //                 InputDecoration(border: InputBorder.none),
+                    //             textAlign: TextAlign.right,
+                    //             initialValue: _currentIntValue.toString(),
+                    //             keyboardType: TextInputType.number,
+                    //             style: TextStyle(
+                    //                 color: Colors.white,
+                    //                 fontWeight: FontWeight.bold,
+                    //                 fontSize: 18)))),
                     Flexible(
                       flex: 1,
                       child: Container(
                         height: 48,
                         color: const Color(0xFF0072ff),
                         child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("min",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18)),
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            child: Text(
+                                selectedHours < 1
+                                    ? (selectedHours * 60).toInt().toString() +
+                                        " min"
+                                    : selectedHours.toString() + " h",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18)),
+                            onPressed: () {
+                              print(selectedHours);
+                              var size = MediaQuery.of(context).size;
+                              double height = 300;
+                              var itemWidth = size.width / 2;
+                              var itemHeight = (height - 50) / 2;
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Container(
+                                      height: height,
+                                      color: Colors.blue,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 50,
+                                            child: Align(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                selectedHours < 1
+                                                    ? (selectedHours * 60)
+                                                            .toInt()
+                                                            .toString() +
+                                                        " min"
+                                                    : selectedHours % 1 == 0
+                                                        ? " ${selectedHours.floor()} h"
+                                                        : " ${selectedHours.floor()} h ${((selectedHours % 1) * 60).toInt()} min",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18),
+                                              ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: GridView.count(
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              crossAxisCount: 2,
+                                              childAspectRatio:
+                                                  itemWidth / itemHeight,
+                                              children: [
+                                                CircleHour(
+                                                    updateHours: updateHours,
+                                                    selectedHours:
+                                                        selectedHours,
+                                                    hours: 0.5),
+                                                CircleHour(
+                                                    updateHours: updateHours,
+                                                    selectedHours:
+                                                        selectedHours,
+                                                    hours: 1),
+                                                CircleHour(
+                                                    updateHours: updateHours,
+                                                    selectedHours:
+                                                        selectedHours,
+                                                    hours: 1.5),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      updateHours(2);
+                                                    },
+                                                    child: Container(
+                                                        child: Center(
+                                                            child: Padding(
+                                                                padding: const EdgeInsets.symmetric(
+                                                                    horizontal:
+                                                                        10),
+                                                                child: TextFormField(
+                                                                    decoration: InputDecoration(
+                                                                        border: InputBorder
+                                                                            .none),
+                                                                    textAlign: TextAlign
+                                                                        .right,
+                                                                    initialValue: _currentIntValue
+                                                                        .toString(),
+                                                                    keyboardType: TextInputType
+                                                                        .number,
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontWeight: FontWeight
+                                                                            .bold,
+                                                                        fontSize:
+                                                                            18)))),
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.purple.withOpacity(0.6),
+                                                            borderRadius: BorderRadius.all(Radius.circular(100)))),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            },
+                          ),
                         ),
                       ),
                     )
@@ -397,10 +564,60 @@ class _LogExerciseState extends State<LogExercise> {
                 updateExercise: updateExercise,
                 selectedGroup: selectedGroup,
                 selectedExercise: selectedExercise,
+                selectedActivity: selectedActivity,
                 selectedLevel: selectedLevel,
                 selectedHours: selectedHours)
           ],
         ));
+  }
+}
+
+class CircleHour extends StatefulWidget {
+  const CircleHour({
+    Key key,
+    @required this.selectedHours,
+    @required this.hours,
+    @required this.updateHours,
+  }) : super(key: key);
+
+  final double selectedHours;
+  final double hours;
+  final Function updateHours;
+
+  @override
+  _CircleHourState createState() => _CircleHourState();
+}
+
+class _CircleHourState extends State<CircleHour> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GestureDetector(
+        onTap: () {
+          widget.updateHours(widget.hours);
+        },
+        child: Container(
+            child: Center(
+                child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        widget.hours < 1
+                            ? (widget.hours * 60).toInt().toString() + " min"
+                            : widget.hours % 1 == 0
+                                ? " ${widget.hours.floor()} h"
+                                : " ${widget.hours.floor()} h ${((widget.hours % 1) * 60).toInt()} min",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18)))),
+            decoration: BoxDecoration(
+                color: widget.selectedHours == widget.hours
+                    ? Colors.black.withOpacity(0.2)
+                    : Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.all(Radius.circular(100)))),
+      ),
+    );
   }
 }
 
@@ -533,34 +750,36 @@ class _MenuState extends State<Menu> {
                 Expanded(
                     child: TextButton(
                         onPressed: () async {
-                          _db.exerciseLogCollection
-                              .doc(user.uid)
-                              .collection("userexerciselogs")
-                              .add({
-                            'name': widget.newExerciseLog.name,
-                            'createdat': Timestamp.now(),
-                            'hours': widget.newExerciseLog.hours,
-                            'calories': widget.newExerciseLog.calories
-                          });
+                          if (widget.newExerciseLog.name != null) {
+                            _db.exerciseLogCollection
+                                .doc(user.uid)
+                                .collection("userexerciselogs")
+                                .add({
+                              'name': widget.newExerciseLog.name,
+                              'createdat': Timestamp.now(),
+                              'hours': widget.newExerciseLog.hours,
+                              'calories': widget.newExerciseLog.calories
+                            });
 
-                          _db.summariesCollection
-                              .doc(user.uid)
-                              .collection('userdailysummaries')
-                              .doc(widget.todaySummary.id)
-                              .update({
-                            'exercise': FieldValue.increment(
-                                widget.newExerciseLog.calories)
-                          });
-                          widget.saveItem();
-                          print(
-                              "...............................save success!...............................");
-                          Fluttertoast.showToast(
-                              msg: "saved!",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.TOP,
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
+                            _db.summariesCollection
+                                .doc(user.uid)
+                                .collection('userdailysummaries')
+                                .doc(widget.todaySummary.id)
+                                .update({
+                              'exercise': FieldValue.increment(
+                                  widget.newExerciseLog.calories)
+                            });
+                            widget.saveItem();
+                            print(
+                                "...............................save success!...............................");
+                            Fluttertoast.showToast(
+                                msg: "saved!",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.TOP,
+                                backgroundColor: Colors.green,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          }
                         },
                         style: ButtonStyle(
                             padding: MaterialStateProperty.all<EdgeInsets>(
