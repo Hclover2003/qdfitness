@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qdfitness/services/auth.dart';
 import 'package:qdfitness/shared/shared.dart';
 
-//actual widget
 class Register extends StatefulWidget {
-  //constructor that accepts properties
   final Function toggleView;
   Register({this.toggleView});
 
@@ -12,8 +10,6 @@ class Register extends StatefulWidget {
   _RegisterState createState() => _RegisterState();
 }
 
-//state object
-// note: this. is state, widget. is widget
 class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
@@ -24,6 +20,7 @@ class _RegisterState extends State<Register> {
   String name = '';
   String password = '';
   String error = '';
+
   @override
   Widget build(BuildContext context) {
     return loading

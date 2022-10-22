@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "812958055889-ckj97m031fajste540v3j735162ov38v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qd.qdfitness",
+            "certificate_hash": "c4d59aeb290d431eb0ea14ca485d3950abc398ca"
+          }
+        },
+        {
+          "client_id": "812958055889-de1l4ercicnvekqnl7c0dfuf5fvshg8t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qd.qdfitness",
+            "certificate_hash": "7690ab77303c7379728137bd73803e7096100a99"
+          }
+        },
+        {
           "client_id": "812958055889-7tf7fmp396tk5mri5rbivfp2obhspc9g.apps.googleusercontent.com",
           "client_type": 3
         }

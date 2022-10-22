@@ -13,12 +13,16 @@ class AppPageChild extends StatefulWidget {
 }
 
 class _AppPageChildState extends State<AppPageChild> {
+  //Different screens
   int i = 0;
   var pages = [Home(), LogFood(), LogExercise()];
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+
     return GestureDetector(
+      //Exists keyboard focus on outside tap
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -26,28 +30,34 @@ class _AppPageChildState extends State<AppPageChild> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).backgroundColor,
           elevation: 0,
-          iconTheme: IconThemeData(color: Theme.of(context).accentColor),
+          iconTheme:
+              IconThemeData(color: Theme.of(context).colorScheme.secondary),
           actions: [
+            //Change to Dark Mode
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
               child: IconButton(
                 onPressed: () {
-                  var tmpP = Theme.of(context).backgroundColor;
-                  var tmpA = Theme.of(context).primaryColor;
-                  themeNotifier.setTheme(Theme.of(context)
-                      .copyWith(primaryColor: tmpP, backgroundColor: tmpA));
+                  final tmpP = Theme.of(context).backgroundColor;
+                  final tmpA = Theme.of(context).primaryColor;
+                  themeNotifier.setTheme(ThemeData(
+                      primaryColor: tmpP,
+                      backgroundColor: tmpA,
+                      accentColor: Theme.of(context).accentColor));
                 },
                 icon: Icon(Icons.lightbulb),
               ),
-            )
+            ), Padding(padding: const EdgeInsets.fromLTRB(0, 0, 10, 0), child: IconButton(onPressed: (){}, icon: Icon(Icons.question_mark),),)
           ],
         ),
         drawer: UpperDrawer(),
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
-              canvasColor: Theme.of(context).primaryColor,
-              primaryColor: Theme.of(context).backgroundColor),
+            canvasColor: Theme.of(context).colorScheme.secondary,
+            primaryColor: Theme.of(context).backgroundColor,
+          ),
           child: BottomNavigationBar(
+            selectedItemColor: Theme.of(context).primaryColor,
             items: [
               BottomNavigationBarItem(
                   icon: Icon(

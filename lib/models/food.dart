@@ -30,6 +30,7 @@ class FoodLog {
   Timestamp createdat;
   String uid;
   String id;
+  //TODO: add foodgroup property
 
   bool saved;
   @override

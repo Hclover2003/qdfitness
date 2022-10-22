@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +10,6 @@ import 'package:qdfitness/models/food.dart';
 import 'package:qdfitness/screens/home/exercisechoices.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/constantfns.dart';
-import 'dart:math';
 
 class LogExercise extends StatefulWidget {
   //meal and group constants
@@ -45,21 +45,22 @@ class _LogExerciseState extends State<LogExercise> {
   String selectedLevel = "moderate";
   String selectedExercise;
   Exercise selectedActivity;
-  double selectedHours = 0.5;
+
   int selectedCalories = 0;
-  double metvalue = 0;
+  double selectedHours = 0.5;
   double weight = 55.6;
-
-  ExerciseLog newExerciseLog;
-
-  double _currentSliderValue = 0;
-  int _currentIntValue = 30;
 
   Level _level = Level.light;
 
 //update the new exerciselog info
   void updateExercise(Exercise exercise) {
-    print(exercise.get(selectedLevel));
+    double metval = exercise.get(selectedLevel);
+    if (metval == 0) {
+      setState(() {
+        selectedLevel = "moderate";
+        _level = Level.moderate;
+      });
+    }
     setState(() {
       selectedExercise = exercise.name;
       selectedActivity = exercise;
@@ -195,26 +196,13 @@ class _LogExerciseState extends State<LogExercise> {
                     ]),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(selectedHours.toString() ?? "null"),
-                Text(selectedExercise ?? "null"),
-                Text(selectedActivity != null
-                    ? (weight *
-                                selectedActivity.get(selectedLevel) *
-                                selectedHours)
-                            .toInt()
-                            .toString() ??
-                        "null"
-                    : "nothing")
-              ],
-            ),
+
             //menu
             Menu(
               newExerciseLog: ExerciseLog(
                   hours: selectedHours,
                   name: selectedExercise,
+                  level: selectedLevel,
                   calories: selectedActivity != null
                       ? (weight *
                               selectedActivity.get(selectedLevel) *
@@ -233,7 +221,7 @@ class _LogExerciseState extends State<LogExercise> {
                 child: Row(
                   children: [
                     Flexible(
-                      flex: 4,
+                      flex: 2,
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
@@ -250,163 +238,15 @@ class _LogExerciseState extends State<LogExercise> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Radio<Level>(
-                              fillColor: MaterialStateColor.resolveWith(
-                                  (states) => selectedActivity == null
-                                      ? Colors.white
-                                      : selectedActivity.veryLight == 0
-                                          ? Colors.blueGrey[300]
-                                          : Colors.white),
-                              focusColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
-                              value: Level.veryLight,
-                              groupValue: _level,
-                              onChanged: selectedActivity == null
-                                  ? null
-                                  : selectedActivity.veryLight == 0
-                                      ? null
-                                      : (Level level) {
-                                          setState(() {
-                                            _level = level;
-                                            selectedLevel = "veryLight";
-                                          });
-                                        },
-                            ),
-                            Radio<Level>(
-                              fillColor: MaterialStateColor.resolveWith(
-                                  (states) => selectedActivity == null
-                                      ? Colors.white
-                                      : selectedActivity.light == 0
-                                          ? Colors.blueGrey[300]
-                                          : Colors.white),
-                              focusColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
-                              value: Level.light,
-                              groupValue: _level,
-                              onChanged: selectedActivity == null
-                                  ? null
-                                  : selectedActivity.light == 0
-                                      ? null
-                                      : (Level level) {
-                                          setState(() {
-                                            _level = level;
-                                            selectedLevel = "light";
-                                          });
-                                        },
-                            ),
-                            Radio<Level>(
-                              fillColor: MaterialStateColor.resolveWith(
-                                  (states) => selectedActivity == null
-                                      ? Colors.white
-                                      : selectedActivity.moderate == 0
-                                          ? Colors.blueGrey[300]
-                                          : Colors.white),
-                              focusColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
-                              value: Level.moderate,
-                              groupValue: _level,
-                              onChanged: selectedActivity == null
-                                  ? null
-                                  : selectedActivity.moderate == 0
-                                      ? null
-                                      : (Level level) {
-                                          setState(() {
-                                            _level = level;
-                                            selectedLevel = "moderate";
-                                          });
-                                        },
-                            ),
-                            Radio<Level>(
-                              fillColor: MaterialStateColor.resolveWith(
-                                  (states) => selectedActivity == null
-                                      ? Colors.white
-                                      : selectedActivity.intense == 0
-                                          ? Colors.blueGrey[300]
-                                          : Colors.white),
-                              focusColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
-                              value: Level.intense,
-                              groupValue: _level,
-                              onChanged: selectedActivity == null
-                                  ? null
-                                  : selectedActivity.intense == 0
-                                      ? null
-                                      : (Level level) {
-                                          setState(() {
-                                            _level = level;
-                                            selectedLevel = "intense";
-                                          });
-                                        },
-                            ),
-                            Radio<Level>(
-                              fillColor: MaterialStateColor.resolveWith(
-                                  (states) => selectedActivity == null
-                                      ? Colors.white
-                                      : selectedActivity.veryIntense == 0
-                                          ? Colors.blueGrey[300]
-                                          : Colors.white),
-                              focusColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white),
-                              value: Level.veryIntense,
-                              groupValue: _level,
-                              onChanged: selectedActivity == null
-                                  ? null
-                                  : selectedActivity.veryIntense == 0
-                                      ? null
-                                      : (Level level) {
-                                          setState(() {
-                                            _level = level;
-                                            selectedLevel = "veryIntense";
-                                          });
-                                        },
-                            )
+                            RadioLevel("veryLight", Level.veryLight),
+                            RadioLevel("light", Level.light),
+                            RadioLevel("moderate", Level.moderate),
+                            RadioLevel("intense", Level.intense),
+                            RadioLevel("veryIntense", Level.veryIntense),
                           ],
                         ),
-                        // child: SliderTheme(
-                        //   data: SliderTheme.of(context).copyWith(
-                        //     activeTrackColor: Colors.white.withOpacity(1),
-                        //     inactiveTrackColor: Colors.white.withOpacity(.5),
-                        //     trackHeight: 4.0,
-                        //     thumbShape: CustomSliderThumbCircle(
-                        //       thumbRadius: 48 * .4,
-                        //       min: 240,
-                        //       max: 740,
-                        //     ),
-                        //     overlayColor: Colors.white.withOpacity(.4),
-                        //     //valueIndicatorColor: Colors.white,
-                        //     activeTickMarkColor: Colors.white,
-                        //     inactiveTickMarkColor: Colors.white.withOpacity(.7),
-                        //   ),
-                        //   child: Slider(
-                        //       value: _currentSliderValue,
-                        //       min: 0,
-                        //       max: 3,
-                        //       divisions: 3,
-                        //       label: widget
-                        //           .exerciseLevels[_currentSliderValue.toInt()],
-                        //       onChanged: (double value) {
-                        //         setState(() {
-                        //           _currentSliderValue = value;
-                        //         });
-                        //       }),
-                        // ),
                       ),
                     ),
-                    // Flexible(
-                    //     flex: 1,
-                    //     child: Container(
-                    //         height: 48,
-                    //         color: const Color(0xFF0072ff),
-                    //         child: TextFormField(
-                    //             decoration:
-                    //                 InputDecoration(border: InputBorder.none),
-                    //             textAlign: TextAlign.right,
-                    //             initialValue: _currentIntValue.toString(),
-                    //             keyboardType: TextInputType.number,
-                    //             style: TextStyle(
-                    //                 color: Colors.white,
-                    //                 fontWeight: FontWeight.bold,
-                    //                 fontSize: 18)))),
                     Flexible(
                       flex: 1,
                       child: Container(
@@ -419,108 +259,19 @@ class _LogExerciseState extends State<LogExercise> {
                                 selectedHours < 1
                                     ? (selectedHours * 60).toInt().toString() +
                                         " min"
-                                    : selectedHours.toString() + " h",
+                                    : selectedHours % 1 == 0
+                                        ? " ${selectedHours.floor()} h"
+                                        : " ${selectedHours.floor()} h ${((selectedHours % 1) * 60).toInt()} min",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18)),
                             onPressed: () {
-                              print(selectedHours);
-                              var size = MediaQuery.of(context).size;
-                              double height = 300;
-                              var itemWidth = size.width / 2;
-                              var itemHeight = (height - 50) / 2;
                               showModalBottomSheet(
                                   context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      height: height,
-                                      color: Colors.blue,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: 50,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                selectedHours < 1
-                                                    ? (selectedHours * 60)
-                                                            .toInt()
-                                                            .toString() +
-                                                        " min"
-                                                    : selectedHours % 1 == 0
-                                                        ? " ${selectedHours.floor()} h"
-                                                        : " ${selectedHours.floor()} h ${((selectedHours % 1) * 60).toInt()} min",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18),
-                                              ),
-                                            ),
-                                          ),
-                                          Flexible(
-                                            child: GridView.count(
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              crossAxisCount: 2,
-                                              childAspectRatio:
-                                                  itemWidth / itemHeight,
-                                              children: [
-                                                CircleHour(
-                                                    updateHours: updateHours,
-                                                    selectedHours:
-                                                        selectedHours,
-                                                    hours: 0.5),
-                                                CircleHour(
-                                                    updateHours: updateHours,
-                                                    selectedHours:
-                                                        selectedHours,
-                                                    hours: 1),
-                                                CircleHour(
-                                                    updateHours: updateHours,
-                                                    selectedHours:
-                                                        selectedHours,
-                                                    hours: 1.5),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      updateHours(2);
-                                                    },
-                                                    child: Container(
-                                                        child: Center(
-                                                            child: Padding(
-                                                                padding: const EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        10),
-                                                                child: TextFormField(
-                                                                    decoration: InputDecoration(
-                                                                        border: InputBorder
-                                                                            .none),
-                                                                    textAlign: TextAlign
-                                                                        .right,
-                                                                    initialValue: _currentIntValue
-                                                                        .toString(),
-                                                                    keyboardType: TextInputType
-                                                                        .number,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontWeight: FontWeight
-                                                                            .bold,
-                                                                        fontSize:
-                                                                            18)))),
-                                                        decoration: BoxDecoration(
-                                                            color: Colors.purple.withOpacity(0.6),
-                                                            borderRadius: BorderRadius.all(Radius.circular(100)))),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  builder: (BuildContext context) {
+                                    return BottomSheetHours(
+                                      updateHours: updateHours,
                                     );
                                   });
                             },
@@ -570,52 +321,30 @@ class _LogExerciseState extends State<LogExercise> {
           ],
         ));
   }
-}
 
-class CircleHour extends StatefulWidget {
-  const CircleHour({
-    Key key,
-    @required this.selectedHours,
-    @required this.hours,
-    @required this.updateHours,
-  }) : super(key: key);
-
-  final double selectedHours;
-  final double hours;
-  final Function updateHours;
-
-  @override
-  _CircleHourState createState() => _CircleHourState();
-}
-
-class _CircleHourState extends State<CircleHour> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {
-          widget.updateHours(widget.hours);
-        },
-        child: Container(
-            child: Center(
-                child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                        widget.hours < 1
-                            ? (widget.hours * 60).toInt().toString() + " min"
-                            : widget.hours % 1 == 0
-                                ? " ${widget.hours.floor()} h"
-                                : " ${widget.hours.floor()} h ${((widget.hours % 1) * 60).toInt()} min",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18)))),
-            decoration: BoxDecoration(
-                color: widget.selectedHours == widget.hours
-                    ? Colors.black.withOpacity(0.2)
-                    : Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.all(Radius.circular(100)))),
+  Tooltip RadioLevel(String leveltxt, Level level) {
+    return Tooltip(
+      message: leveltxt,
+      child: Radio<Level>(
+        fillColor:
+            MaterialStateColor.resolveWith((states) => selectedActivity == null
+                ? Colors.white
+                : selectedActivity.get(leveltxt) == 0
+                    ? Colors.blueGrey[300]
+                    : Colors.white),
+        focusColor: MaterialStateColor.resolveWith((states) => Colors.white),
+        value: level,
+        groupValue: _level,
+        onChanged: selectedActivity == null
+            ? null
+            : selectedActivity.get(leveltxt) == 0
+                ? null
+                : (Level level) {
+                    setState(() {
+                      _level = level;
+                      selectedLevel = leveltxt;
+                    });
+                  },
       ),
     );
   }
@@ -684,7 +413,7 @@ class _MenuState extends State<Menu> {
                                 'exercise':
                                     FieldValue.increment(-1 * item.calories)
                               });
-                              _db.deleteFoodLog(item.id);
+                              _db.deleteExerciseLog(item.id);
                             }
                           },
                           confirmDismiss: (DismissDirection direction) async {
@@ -741,7 +470,7 @@ class _MenuState extends State<Menu> {
                         backgroundColor:
                             MaterialStateProperty.all(Colors.red.shade300)),
                     child: Text(
-                      "clear all",
+                      "clear",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -758,6 +487,7 @@ class _MenuState extends State<Menu> {
                               'name': widget.newExerciseLog.name,
                               'createdat': Timestamp.now(),
                               'hours': widget.newExerciseLog.hours,
+                              'level': widget.newExerciseLog.level,
                               'calories': widget.newExerciseLog.calories
                             });
 
@@ -821,10 +551,34 @@ class ExerciseLogTile extends StatefulWidget {
 
 class _ExerciseLogTileState extends State<ExerciseLogTile> {
   Color mycolor;
+  Color levelcolor;
+  String mode = "light";
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      switch (widget.item.level) {
+        case 'veryLight':
+          levelcolor = Colors.blue[200];
+          break;
+        case 'light':
+          levelcolor = Colors.blue[300];
+          break;
+        case 'moderate':
+          levelcolor = Colors.blue[500];
+          mode = "dark";
+          break;
+        case 'intense':
+          levelcolor = Colors.blue[700];
+          mode = "dark";
+          break;
+        case 'veryIntense':
+          levelcolor = Colors.blue[900];
+          mode = "dark";
+          break;
+      }
+    });
     if (widget.item.saved) {
       setState(() {
         mycolor = Colors.white;
@@ -840,9 +594,82 @@ class _ExerciseLogTileState extends State<ExerciseLogTile> {
   Widget build(BuildContext context) {
     return ListTile(
       tileColor: mycolor,
-      leading: Text(widget.item.hours.toString() + "h"),
+      leading: Container(
+          height: 50,
+          width: 80,
+          color: levelcolor,
+          child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                widget.item.hours < 1
+                    ? (widget.item.hours * 60).toInt().toString() + " min"
+                    : widget.item.hours % 1 == 0
+                        ? " ${widget.item.hours.floor()} h"
+                        : " ${widget.item.hours.floor()} h ${((widget.item.hours % 1) * 60).toInt()} min",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: mode == "light" ? Colors.black : Colors.white),
+              ))),
       title: Center(child: Text(widget.item.name)),
       trailing: Text(widget.item.calories.toString() + " cal"),
+    );
+  }
+}
+
+class BottomSheetHours extends StatefulWidget {
+  const BottomSheetHours({
+    Key key,
+    @required this.updateHours,
+  }) : super(key: key);
+
+  final Function updateHours;
+  @override
+  _BottomSheetHoursState createState() => _BottomSheetHoursState();
+}
+
+List<double> hourslist = [0.25, 0.5, 0.75, 1, 1.5, 1.75, 2];
+
+class _BottomSheetHoursState extends State<BottomSheetHours> {
+  double _hourschoice = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: 200,
+        color: Colors.blue,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Wrap(spacing: 10, runSpacing: 4, children: [
+              for (var i in hourslist)
+                createChoiceChip(index: i, label: i.toString())
+            ])
+          ],
+        ));
+  }
+
+  Widget createChoiceChip({double index, String label}) {
+    return ChoiceChip(
+      label: Text(
+          index < 1
+              ? (index * 60).toInt().toString() + " min"
+              : index % 1 == 0
+                  ? " ${index.floor()} h"
+                  : " ${index.floor()} h ${((index % 1) * 60).toInt()} min",
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+      labelStyle:
+          TextStyle(color: Colors.black87, fontFamily: 'Futura', fontSize: 13),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: Colors.grey[600].withOpacity(0.7),
+      disabledColor: Colors.black,
+      selected: _hourschoice == index,
+      onSelected: (bool selected) {
+        setState(() {
+          _hourschoice = index;
+        });
+        widget.updateHours(index);
+      },
     );
   }
 }

@@ -19,7 +19,7 @@ class FoodChoices extends StatelessWidget {
   final String selectedGroup;
   final List<FoodLog> selectedFoods;
   final String selectedMeal;
-  
+
   final Function addFood;
   final Function editFoodNum;
 
@@ -65,7 +65,7 @@ class FoodChoices extends StatelessWidget {
         return Expanded(
           flex: 4,
           child: Container(
-            color: Colors.white,
+            color: Theme.of(context).primaryColor,
             child: GridView.count(crossAxisCount: 3, children: [
               if (selectedGroup == 'recent')
                 for (var food in recentfoodlogs)

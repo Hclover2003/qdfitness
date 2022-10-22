@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:qdfitness/models/appuser.dart';
 import 'package:qdfitness/models/food.dart';
-import 'package:qdfitness/screens/home/weekchart.dart';
-import 'package:qdfitness/screens/menu/aboutus.dart';
 import 'package:qdfitness/services/database.dart';
 import 'package:qdfitness/shared/constantfns.dart';
 import 'package:qdfitness/shared/extensions.dart';
+import 'package:qdfitness/screens/home/weekchart.dart';
+import 'package:qdfitness/screens/menu/aboutus.dart';
 
-//home page
+//Homepage: Displays summary for day and week
 class Home extends StatefulWidget {
   const Home({
     Key key,
@@ -20,6 +20,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  /// todaySummary: dailysummary for today
+  // recentSummaries: list of dailysummaries for past 7 days
+  // weekdata: list of (date, food, exercise) for weekchart
+
   DailySummary todaySummary;
   List<DailySummary> recentSummaries;
   List<WeekData> weekdata;
@@ -30,24 +34,13 @@ class _HomeState extends State<Home> {
     final DatabaseService _db = DatabaseService(uid: userdata.uid);
     final dailysummaries = Provider.of<List<DailySummary>>(context);
 
-    //FIXME: sometimes create new summary even if summary exists
-    //check summaries, see if today summary exists. If not, create one
+    //Create and/or get today's summary
     if (dailysummaries == null) {
-      if (DateTime.parse(userdata.createdAt.toDate().toString())
-              .difference(DateTime.now())
-              .inMinutes <
-          1) {
-        print("yay");
-      } else {
-        print("loading...");
-      }
-    } else if (dailysummaries.length == 0) {
-      print("no summaries");
-      _db.createNewSummary();
+      print("loading...");
     } else {
-      var todaysum = getTodaySummary(dailysummaries);
+      final todaysum = getTodaySummary(dailysummaries);
       if (todaysum == null) {
-        print("no summary for today");
+        print("no summary for today yet");
         _db.createNewSummary();
       } else {
         setState(() {
@@ -55,6 +48,8 @@ class _HomeState extends State<Home> {
         });
       }
     }
+
+    //Get recent summaries for week
     dailysummaries.sort((b, a) => a.date.compareTo(b.date));
     var weekago = DateTime.now().subtract(Duration(days: 7));
     setState(() {
@@ -68,83 +63,101 @@ class _HomeState extends State<Home> {
               i.food.toDouble(), i.exercise.toDouble()))
           .toList();
     });
-    double metabolism = userdata.weight != null
-        ? (-1) *
-            (447.593 +
-                (0.246 * userdata.weight) +
-                (3.098 * userdata.height) -
-                (4.33 * userdata.age.toDouble()))
-        : 14;
-    // String currenttime = DateFormat.jm().format(DateTime.now());
-    // String currentdate = DateFormat.yMMMMEEEEd().format(now);
+    String gender = "F";
+    double weight = 56.5;
+    double height = 167;
+    int age = 18;
+    String activity = "sedentary";
+    double activitylevel;
+    switch (activity) {
+      case "sedentary":
+        activitylevel = 1.2;
+        break;
+      case "lightly active":
+        activitylevel = 1.375;
+        break;
+      case "moderately active":
+        activitylevel = 1.55;
+        break;
+      case "very active":
+        activitylevel = 1.725;
+        break;
+    }
+    double metabolism = gender == "F"
+        ? (655 + (9.6 * weight) + (1.8 * height) - (4.7 * age)) * activitylevel
+        : (66 + (13.7 * weight) + (5 * height) - (6.8 * age)) * activitylevel;
 
-    //return loading if fetching today's summary
+    //Return's loading if fetching summary
     return (todaySummary == null)
         //FIXME: better loading screen
         ? Text("Loading...")
         : SingleChildScrollView(
-            child: Stack(children: [
-              //FIXME: better background image
-              Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/images/imgs.png"),
-                        fit: BoxFit.cover)),
-              ),
-              Center(
-                child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                  child: Column(
-                    children: [
-                      //TODO: jump to edit page on button click
-                      //TODO: change age, height, weight, gender (used to calculate BMR)
-                      Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
-                      SummaryRow(
-                        name: "Food",
-                        cal: todaySummary.food,
-                        icon: Icons.add,
+            child: Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                child: Column(
+                  children: [
+                    //TODO: jump to edit page on button click
+                    //TODO: change age, height, weight, gender (used to calculate BMR)
+                    Subtitle(text: 'Hello ${userdata.name.capitalize()} !'),
+                    SummaryRow(
+                      name: "Food",
+                      cal: todaySummary.food,
+                      icon: Icons.add,
+                    ),
+                    SummaryRow(
+                      name: "Exercise",
+                      cal: -1 * todaySummary.exercise,
+                      icon: Icons.add,
+                    ),
+                    SummaryRow(
+                      name: "Current Goal",
+                      cal: metabolism.round(),
+                      icon: Icons.edit,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                              child: Text(
+                            "Total",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor),
+                          )),
+                          Expanded(
+                              child: Text(
+                            (todaySummary.food - todaySummary.exercise)
+                                    .toString() +
+                                " cal",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline4
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor),
+                          ))
+                        ],
                       ),
-                      SummaryRow(
-                        name: "Exercise",
-                        cal: todaySummary.exercise,
-                        icon: Icons.add,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: WeekChart(
+                        weekdata: weekdata.reversed.toList(),
                       ),
-                      SummaryRow(
-                        name: "Current Goal",
-                        cal: metabolism.round(),
-                        icon: Icons.edit,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Text(
-                              "Total",
-                              style: Theme.of(context).textTheme.headline5,
-                            )),
-                            Expanded(
-                                child: Text(
-                              (todaySummary.food + todaySummary.exercise)
-                                  .toString(),
-                              style: Theme.of(context).textTheme.headline4,
-                            ))
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        child: WeekChart(
-                          weekdata: weekdata.reversed.toList(),
-                        ),
-                      ),
-                      TextButton(onPressed: () {}, child: Text("More..."))
-                      //TODO: Pie chart of different foodgroup percentages for today
-                    ],
-                  ),
+                    ),
+                    TextButton(onPressed: () {}, child: Text("More")),
+                    TextButton(onPressed: () {}, child: Text("Reset"))
+                    //TODO: Pie chart of different foodgroup percentages for today; pop up menu with all dailysummaries
+                  ],
                 ),
               ),
-            ]),
+            ),
           );
   }
 }
@@ -159,21 +172,44 @@ class SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(child: Text(name)),
-          Expanded(child: Center(child: Text(cal.toString()))),
-          Expanded(
+    return Container(
+      color: Theme.of(context).primaryColor,
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(name,
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+            Text(
+              (cal.isNegative ? "- " : "+ ") + cal.abs().toString(),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+            Container(
+              color: Colors.white,
+              margin: EdgeInsets.all(0),
               child: IconButton(
-            icon: Icon(icon),
-            onPressed: () {
-              print("metabolism edit...");
-            },
-          ))
-        ],
+                icon: IconTheme(
+                    data: IconThemeData(size: 30),
+                    child: Icon(
+                      icon,
+                      color: Theme.of(context).primaryColor,
+                    )),
+                onPressed: () {
+                  print("metabolism edit...");
+                },
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

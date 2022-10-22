@@ -16,10 +16,11 @@ class _ThemeChangerState extends State<ThemeChanger> {
   ThemeData _customTheme = ThemeData(
       primaryColor:
           Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0),
-      accentColor:
-          Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0),
       backgroundColor:
-          Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0));
+          Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0),
+      colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Color((Random().nextDouble() * 0xFFFFFF).toInt())
+              .withOpacity(1.0)));
 
   @override
   Widget build(BuildContext context) {

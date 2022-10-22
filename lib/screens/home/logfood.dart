@@ -36,7 +36,7 @@ class _LogFoodState extends State<LogFood> {
 
   List<FoodLog> items = [];
   int tmpCals = 0;
-  
+
   //TODO: sort detailed popup menu by meal, number of calories, time
   List<bool> _selections = [false, false, false];
 
@@ -103,7 +103,6 @@ class _LogFoodState extends State<LogFood> {
       todaysummary = getTodaySummary(dailysummaries);
     });
 
-
 //gets a stream of foodlogs
     return StreamProvider<List<FoodLog>>.value(
         initialData: [],
@@ -115,138 +114,162 @@ class _LogFoodState extends State<LogFood> {
               color: Theme.of(context).backgroundColor,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                  Text(
-                    "/1500",
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  Text(
-                    (todaysummary.food + tmpCals).toString() + " cal",         
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                  //expand icon
-                  //FIXME: streamprovider is scoped (cannot access db.foodlogs)
-                  IconButton(
-                      icon: Icon(Icons.zoom_in),
-                      onPressed: () {
-                        // var myModel = Provider.of<List<FoodLog>>(context, listen: false);
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => Dialog(
-                                insetPadding: EdgeInsets.fromLTRB(20, 20, 20, 100),
-                                child: Column(
-                                  children: [
-                                    Center(
-                                        child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Text(
-                                        (todaysummary.food + tmpCals).toString() + 
-                                        " cals",
-                                        style:
-                                            Theme.of(context).textTheme.headline4,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "/1500",
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      Text(
+                        (todaysummary.food + tmpCals).toString() + " cal",
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
+                      //expand icon
+                      //FIXME: streamprovider is scoped (cannot access db.foodlogs)
+                      IconButton(
+                          icon: Icon(Icons.zoom_in),
+                          onPressed: () async {
+                            List foods = await _db.getFoodlogs();
+                            // var myModel = Provider.of<List<FoodLog>>(context, listen: false);
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) => Dialog(
+                                      insetPadding:
+                                          EdgeInsets.fromLTRB(20, 20, 20, 100),
+                                      child: Column(
+                                        children: [
+                                          Center(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Text(
+                                              (todaysummary.food + tmpCals)
+                                                      .toString() +
+                                                  " cals",
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4,
+                                            ),
+                                          )),
+                                          ToggleButtons(
+                                            children: [
+                                              Icon(Icons.cake),
+                                              Icon(Icons.alarm),
+                                              Icon(Icons.label)
+                                            ],
+                                            isSelected: _selections,
+                                          ),
+                                          Flexible(
+                                            flex: 1,
+                                            child: SizedBox(
+                                                child: Align(
+                                              alignment: Alignment.topCenter,
+                                              child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: items.length +
+                                                      foods.length,
+                                                  itemBuilder: (context, i) {
+                                                    var allItems = [
+                                                      ...items,
+                                                      ...foods
+                                                    ];
+                                                    return ListTile(
+                                                      tileColor: allItems[i]
+                                                              .saved
+                                                          ? Colors.red[100]
+                                                          : Colors.blue[100],
+                                                      leading: Text(allItems[i]
+                                                              .num
+                                                              .toString() +
+                                                          "x"),
+                                                      title: Center(
+                                                          child: Text(allItems[
+                                                                      i]
+                                                                  .name +
+                                                              DateFormat(
+                                                                      'yyyy-MM-dd hh:mm')
+                                                                  .format(allItems[
+                                                                          i]
+                                                                      .createdat
+                                                                      .toDate())
+                                                                  .toString())),
+                                                      trailing: Text(
+                                                          (allItems[i].calories *
+                                                                      items[i]
+                                                                          .num)
+                                                                  .toString() +
+                                                              " cal"),
+                                                    );
+                                                  }),
+                                            )),
+                                          ),
+                                          TextButton(
+                                              onPressed: () => Navigator.pop(
+                                                  context, 'Exit'),
+                                              child: Text('Exit'))
+                                        ],
                                       ),
-                                    )),
-                                    ToggleButtons(
-                                      children: [
-                                        Icon(Icons.cake),
-                                        Icon(Icons.alarm),
-                                        Icon(Icons.label)
-                                      ],
-                                      isSelected: _selections,
-                                    ),
-                                    Flexible(
-                                      flex: 1,
-                                      child: SizedBox(
-                                          child: Align(
-                                        alignment: Alignment.topCenter,
-                                        child: ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: items.length,
-                                            itemBuilder: (context, i) {
-                                              var allItems = items;
-                                              return ListTile(
-                                                tileColor: allItems[i].saved
-                                                    ? Colors.red[100]
-                                                    : Colors.blue[100],
-                                                leading: Text(
-                                                    allItems[i].num.toString() + "x"),
-                                                title: Center(
-                                                    child: Text(allItems[i].name +
-                                                        DateFormat(
-                                                                'yyyy-MM-dd hh:mm')
-                                                            .format(allItems[i]
-                                                                .createdat
-                                                                .toDate())
-                                                            .toString())),
-                                                trailing: Text((allItems[i].calories *
-                                                            items[i].num)
-                                                        .toString() +
-                                                    " cal"),
-                                              );
-                                            }),
-                                      )),
-                                    ),
-                                    TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, 'Exit'),
-                                        child: Text('Exit'))
-                                  ],
-                                ),
-                              ));})
-                ]),
+                                    ));
+                          })
+                    ]),
               ),
             ),
-            
+
             //stationary menu
             Menu(
-                items: items,
-                clearAllSelected: clearAllSelected,
-                saveItem: saveItem,
-                todaySummary: todaysummary,),
-            
+              items: items,
+              clearAllSelected: clearAllSelected,
+              saveItem: saveItem,
+              todaySummary: todaysummary,
+            ),
+
             //choose meal
             Container(
               decoration: BoxDecoration(
-                          gradient: new LinearGradient(
-                              colors: [
-                                Colors.yellow[500],
-                                Colors.yellow[900],
-                              ],
-                              begin: const FractionalOffset(0.0, 0.0),
-                              end: const FractionalOffset(1.0, 1.00),
-                              stops: [0.0, 1.0],
-                              tileMode: TileMode.clamp),
-                        ),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                for (var i in widget.meals)
-                  Expanded(
-                      child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedMeal = i;
-                            });
-                          },
-                          child: Container(
-                            color: !(selectedMeal == i)
-                                ?Colors.transparent
-                                : Colors.white,
-                            height: 50,
-                            child: Center(
-                              child: Text(
-                                i,
-                                style: TextStyle(
-                                    fontWeight: (selectedMeal == i)
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: !(selectedMeal == i)
-                                        ? Colors.white
-                                        : Color.fromRGBO(59, 65, 79, 1)),
-                              ),
-                            ),
-                          )))
-              ]),
+                gradient: new LinearGradient(
+                    colors: [
+                      Colors.yellow[500],
+                      Colors.yellow[900],
+                    ],
+                    begin: const FractionalOffset(0.0, 0.0),
+                    end: const FractionalOffset(1.0, 1.00),
+                    stops: [0.0, 1.0],
+                    tileMode: TileMode.clamp),
+              ),
+
+              //choose meal
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    for (var i in widget.meals)
+                      Expanded(
+                          child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedMeal = i;
+                                });
+                              },
+                              child: Container(
+                                color: !(selectedMeal == i)
+                                    ? Colors.transparent
+                                    : Colors.white,
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    i,
+                                    style: TextStyle(
+                                        fontWeight: (selectedMeal == i)
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: !(selectedMeal == i)
+                                            ? Colors.white
+                                            : Color.fromRGBO(59, 65, 79, 1)),
+                                  ),
+                                ),
+                              )))
+                  ]),
             ),
-            
+
             //choose food group
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               for (var i in widget.foodGroups)
@@ -258,14 +281,18 @@ class _LogFoodState extends State<LogFood> {
                     });
                   },
                   child: Container(
-                    color: Colors.white,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          width: 0, color: Theme.of(context).primaryColor),
+                      color: Theme.of(context).primaryColor,
+                    ),
                     height: 50,
                     child: Center(
                       child: Text(
                         i,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Color.fromRGBO(59, 65, 79, 1),
+                            color: Colors.white,
                             fontWeight: (selectedGroup == i)
                                 ? FontWeight.bold
                                 : FontWeight.normal),
@@ -274,7 +301,7 @@ class _LogFoodState extends State<LogFood> {
                   ),
                 ))
             ]),
-            
+
             //gallary of food choices
             FoodChoices(
                 addFood: addFood,
@@ -296,7 +323,6 @@ class Menu extends StatefulWidget {
     @required this.clearAllSelected,
     @required this.saveItem,
     @required this.todaySummary,
-
   }) : super(key: key);
 
   final List<FoodLog> items;
@@ -326,152 +352,160 @@ class _MenuState extends State<Menu> {
         [];
     foodlogs.sort((a, b) => b.createdat.compareTo(a.createdat));
 
-    return 
+    return Expanded(
+      flex: 6,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+        child: Column(
+          children: [
             Expanded(
-              flex: 6,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(8,0,8,0),
-                child: Column(
-                  children: [
-                    Expanded(
-                        child: ListView.builder(
-                            itemCount: widget.items.length + foodlogs.length,
-                            itemBuilder: (context, i) {
-                              var allItems = widget.items.isNotEmpty
-                                  ? [...widget.items, ...foodlogs]
-                                  : foodlogs;
-                              return Dismissible(
-                                  key: UniqueKey(),
-                                  onDismissed: (direction) async {
-                                    if (direction == DismissDirection.startToEnd) {
-                                      var item = allItems[i];
-                                      print(item.id);
-                                      _db.summariesCollection.doc(user.uid).collection('userdailysummaries').doc(widget.todaySummary.id).update({
-                                    'food': FieldValue.increment(-1*item.num*item.calories)
-                                  });
-                                      _db.deleteFoodLog(item.id);
-                                    }
-                                  },
-                                  confirmDismiss: (DismissDirection direction) async {
-                                    if (direction == DismissDirection.startToEnd) {
-                                      return await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: Text("Confirm"),
-                                            content: Text(
-                                                "Are you sure you wish to delete this item?"),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context).pop(true),
-                                                  child: Text("DELETE")),
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(false),
-                                                child: Text("CANCEL"),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      return false;
-                                    }
-                                  },
-                                  background: Container(
-                                    color: Colors.red,
-                                  ),
-                                  secondaryBackground: Container(color: Colors.green),
-                                  child: FoodLogTile(
-                                    item: allItems[i],
-                                  ));
-                            })),
-                  Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
+                child: ListView.builder(
+                    itemCount: widget.items.length + foodlogs.length,
+                    itemBuilder: (context, i) {
+                      var allItems = widget.items.isNotEmpty
+                          ? [...widget.items, ...foodlogs]
+                          : foodlogs;
+                      return Dismissible(
+                          key: UniqueKey(),
+                          onDismissed: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              var item = allItems[i];
+                              print(item.id);
+                              _db.summariesCollection
+                                  .doc(user.uid)
+                                  .collection('userdailysummaries')
+                                  .doc(widget.todaySummary.id)
+                                  .update({
+                                'food': FieldValue.increment(
+                                    -1 * item.num * item.calories)
+                              });
+                              _db.deleteFoodLog(item.id);
+                            }
+                          },
+                          confirmDismiss: (DismissDirection direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Confirm"),
+                                    content: Text(
+                                        "Are you sure you wish to delete this item?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: Text("DELETE")),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text("CANCEL"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else {
+                              return false;
+                            }
+                          },
+                          background: Container(
+                            color: Colors.red,
+                          ),
+                          secondaryBackground: Container(color: Colors.green),
+                          child: FoodLogTile(
+                            item: allItems[i],
+                          ));
+                    })),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      widget.clearAllSelected();
+                    },
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsets>(
+                            EdgeInsets.all(15)),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        )),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.red.shade300)),
+                    child: Text(
+                      "clear all",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                //view selected
+                Expanded(
+                    child: TextButton(
+                        onPressed: () async {
+                          var saveFoodLogs = []..addAll(widget.items);
+                          var foodtotal = 0;
+                          for (FoodLog foodlog in saveFoodLogs) {
+                            widget.saveItem(foodlog);
+                            _db.foodLogCollection
+                                .doc(user.uid)
+                                .collection("userfoodlogs")
+                                .add({
+                              'name': foodlog.name,
+                              'createdat': Timestamp.now(),
+                              'num': foodlog.num,
+                              'meal': foodlog.meal,
+                              'unit': foodlog.unit,
+                              'calories': foodlog.calories
+                            });
+                            foodtotal += (foodlog.num * foodlog.calories);
+                          }
+                          _db.summariesCollection
+                              .doc(user.uid)
+                              .collection('userdailysummaries')
+                              .doc(widget.todaySummary.id)
+                              .update({
+                            //TODO: update foodgroup for dailysummary
+                            'food': FieldValue.increment(foodtotal)
+                          });
                           widget.clearAllSelected();
+                          print(
+                              "...............................save success!...............................");
+                          Fluttertoast.showToast(
+                              msg: "saved!",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.TOP,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
                         },
                         style: ButtonStyle(
                             padding: MaterialStateProperty.all<EdgeInsets>(
                                 EdgeInsets.all(15)),
-                            shape:
-                                MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
                               borderRadius: BorderRadius.zero,
                             )),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.red.shade300)),
+                            backgroundColor: MaterialStateProperty.all(
+                                Colors.blue.shade200)),
                         child: Text(
-                          "clear all",
+                          "save",
                           style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    //view selected
-                    Expanded(
-                        child: TextButton(
-                            onPressed: () async {
-                              var saveFoodLogs = []..addAll(widget.items);
-                              var foodtotal = 0;
-                              for (FoodLog foodlog in saveFoodLogs) {
-                                widget.saveItem(foodlog);
-                                _db.foodLogCollection
-                                    .doc(user.uid)
-                                    .collection("userfoodlogs")
-                                    .add({
-                                  'name': foodlog.name,
-                                  'createdat': Timestamp.now(),
-                                  'num': foodlog.num,
-                                  'meal': foodlog.meal,
-                                  'unit': foodlog.unit,
-                                  'calories': foodlog.calories
-                                });
-                                foodtotal +=(foodlog.num*foodlog.calories);
-                              }
-                              _db.summariesCollection.doc(user.uid).collection('userdailysummaries').doc(widget.todaySummary.id).update({
-                                'food': FieldValue.increment(foodtotal)
-                              });
-                              widget.clearAllSelected();                       
-                              print(
-                                  "...............................save success!...............................");
-                              Fluttertoast.showToast(
-                                  msg: "saved!",
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.TOP,
-                                  backgroundColor: Colors.green,
-                                  textColor: Colors.white,
-                                  fontSize: 16.0);
-                            },
-                            style: ButtonStyle(
-                                padding: MaterialStateProperty.all<EdgeInsets>(
-                                    EdgeInsets.all(15)),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero,
-                                )),
-                                backgroundColor: MaterialStateProperty.all(
-                                    Colors.blue.shade200)),
-                            child: Text(
-                              "save",
-                              style: TextStyle(color: Colors.white),
-                            )))
-                  ],
-                ),
-                Container(height: 10,color: Theme.of(context).backgroundColor,)],
-               
-               ),
-              ),
-            );
-                
-    
-    
+                        )))
+              ],
+            ),
+            Container(
+              height: 10,
+              color: Theme.of(context).backgroundColor,
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
-
 
 //foodlog tile in menu
 class FoodLogTile extends StatefulWidget {
@@ -495,20 +529,20 @@ class _FoodLogTileState extends State<FoodLogTile> {
   void initState() {
     super.initState();
     setState(() {
-      switch(widget.item.meal){
-          case 'breakfast':
-            mealcolor = Colors.yellow[100];
-            break;
-          case 'lunch':
+      switch (widget.item.meal) {
+        case 'breakfast':
+          mealcolor = Colors.yellow[100];
+          break;
+        case 'lunch':
           mealcolor = Colors.yellow[400];
-            break;
-          case 'dinner':
+          break;
+        case 'dinner':
           mealcolor = Colors.yellow[700];
-            break;
-          case 'snacks':
+          break;
+        case 'snacks':
           mealcolor = Colors.yellow[900];
-            break;
-        }
+          break;
+      }
     });
 
     if (widget.item.saved) {
@@ -526,7 +560,16 @@ class _FoodLogTileState extends State<FoodLogTile> {
   Widget build(BuildContext context) {
     return ListTile(
       tileColor: (mycolor),
-      leading: Container(height:50, width: 50, color: mealcolor, child: Align(alignment: Alignment.center, child: Text(widget.item.num.toString() + "x", textAlign: TextAlign.center,))),
+      leading: Container(
+          height: 50,
+          width: 50,
+          color: mealcolor,
+          child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                widget.item.num.toString() + "x",
+                textAlign: TextAlign.center,
+              ))),
       title: Center(child: Text(widget.item.name)),
       trailing:
           Text((widget.item.calories * widget.item.num).toString() + " cal"),

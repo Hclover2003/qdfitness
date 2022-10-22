@@ -102,7 +102,9 @@ class _CircleItemState extends State<CircleItem> {
                               : ColorFilter.mode(Colors.black.withOpacity(0.6),
                                   BlendMode.darken),
                           image:
-                              AssetImage('assets/img/${widget.food.name}.jpg')),
+                          widget.food.group == 'other'? AssetImage('assets/img/cake.jpg'):
+                              AssetImage('assets/img/${widget.food.name}.jpg'),
+                              ),
                       borderRadius: BorderRadius.all(Radius.circular(100)))),
               (() {
                 if (foodInList() == null)
@@ -135,3 +137,4 @@ class _CircleItemState extends State<CircleItem> {
         ));
   }
 }
+

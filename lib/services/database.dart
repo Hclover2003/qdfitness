@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:qdfitness/models/appuser.dart';
 import 'package:qdfitness/models/exercise.dart';
 import 'package:qdfitness/models/food.dart';
@@ -21,7 +22,7 @@ class DatabaseService {
   final CollectionReference<Map<String, dynamic>> foodLogCollection =
       FirebaseFirestore.instance.collection('foodLogs');
 
-      final CollectionReference<Map<String, dynamic>> exerciseCollection =
+  final CollectionReference<Map<String, dynamic>> exerciseCollection =
       FirebaseFirestore.instance.collection('exerciseData');
 
   final CollectionReference<Map<String, dynamic>> exerciseLogCollection =
@@ -64,6 +65,14 @@ class DatabaseService {
         .collection("userfoodlogs")
         .snapshots()
         .map(_foodLogListFromSnapshot);
+  }
+
+  Future<List<FoodLog>> getFoodlogs() async {
+    QuerySnapshot querySnapshot =
+        await foodLogCollection.doc(uid).collection("userfoodlogs").get();
+    final List<FoodLog> allFoodLogs =
+        querySnapshot.docs.map((doc) => doc.data()).toList();
+    return allFoodLogs;
   }
 
   List<FoodLog> _foodLogListFromSnapshot(QuerySnapshot snapshot) {
@@ -114,20 +123,29 @@ class DatabaseService {
         uid: uid,
         name: snapshot['name'],
         createdAt: snapshot['createdAt'],
-        dailyExercise: snapshot['dailyexercise'],
-        dailyFood: snapshot['dailyfood'],
         weight: snapshot['weight'],
         height: snapshot['height'],
         age: snapshot['age']);
   }
 
+  Future<void> deleteExerciseLog(String id) async {
+    return exerciseLogCollection
+        .doc(uid)
+        .collection("userexerciselogs")
+        .doc(id)
+        .delete()
+        .then((value) => print("item deleted successfully"));
+  }
+
 //DAILYSUMMARIES
   //create summary
   Future<void> createNewSummary() async {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('ddMMyyyy').format(now);
     return await summariesCollection
         .doc(uid)
         .collection("userdailysummaries")
-        .doc()
+        .doc(formattedDate)
         .set({
       'date': Timestamp.now(),
       'food': 0,
@@ -168,10 +186,14 @@ class DatabaseService {
   //EXERCISELOG
   //create exerciselog
   Future<void> createExerciseLog(ExerciseLog exerciselog) async {
-    return await exerciseLogCollection.doc(uid).collection("userexerciselogs").add({
+    return await exerciseLogCollection
+        .doc(uid)
+        .collection("userexerciselogs")
+        .add({
       'name': exerciselog.name,
       'createdat': Timestamp.now(),
       'hours': exerciselog.hours,
+      'level': exerciselog.level,
       'calories': exerciselog.calories
     });
   }
@@ -190,21 +212,11 @@ class DatabaseService {
       return ExerciseLog(
           name: doc['name'],
           hours: doc['hours'],
+          level: doc['level'],
           calories: doc['calories'],
           createdat: doc['createdat'],
           id: doc.id,
           saved: true);
     }).toList();
   }
-
-  //delete exerciseLog
-  Future<void> deleteExerciseLog(String id) async {
-    return exerciseLogCollection
-        .doc(uid)
-        .collection("userexerciselogs")
-        .doc(id)
-        .delete()
-        .then((value) => print("item deleted successfully"));
-  }
 }
-

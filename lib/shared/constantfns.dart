@@ -1,5 +1,4 @@
 import 'package:qdfitness/models/food.dart';
-import 'package:qdfitness/services/database.dart';
 
 int calculateMedian(List nums) {
   //clone list
@@ -21,13 +20,11 @@ int calculateMedian(List nums) {
   return median;
 }
 
-DailySummary getTodaySummary(List<DailySummary> dailysummaries){
-
-        return dailysummaries.firstWhere(
-          (x) =>
-              (x.date.day == DateTime.now().day) &&
-              (x.date.month == DateTime.now().month) &&
-              (x.date.year == DateTime.now().year),
-          orElse: () => null);
-
+DailySummary getTodaySummary(List<DailySummary> dailysummaries) {
+  return dailysummaries.firstWhere(
+      (x) =>
+          (x.date.day == DateTime.now().day) &&
+          (x.date.month == DateTime.now().month) &&
+          (x.date.year == DateTime.now().year),
+      orElse: () => null);
 }

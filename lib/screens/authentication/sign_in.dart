@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:qdfitness/services/auth.dart';
-import 'package:qdfitness/shared/constants.dart';
 import 'package:qdfitness/shared/shared.dart';
 
 //widget itself
@@ -50,16 +49,6 @@ class _SignInState extends State<SignIn> {
                         SizedBox(
                           height: 150,
                         ),
-                        //brand logo
-                        // Padding(
-                        //   padding: const EdgeInsets.fromLTRB(10, 100, 10, 30),
-                        //   child: Text('qd fitness diary',
-                        //       style: TextStyle(
-                        //           fontStyle: FontStyle.italic,
-                        //           foreground: Paint()..shader = linearGradient,
-                        //           fontSize: 50.0,
-                        //           fontFamily: 'GlacialIndifference')),
-                        // ),
 
                         //form fields
                         TextFormField(
@@ -145,15 +134,14 @@ class _SignInState extends State<SignIn> {
                           height: 50.0,
                           child: TextButton(
                             child: Text(
-                              'Continue as Guest',
-                              style: TextStyle(fontStyle: FontStyle.italic),
+                              'Sign in with Google',
                             ),
                             style: TextButton.styleFrom(
                               primary: Colors.white,
                               backgroundColor: Color.fromRGBO(255, 145, 77, 1),
                             ),
                             onPressed: () async {
-                              dynamic result = await _auth.signInAnon();
+                              dynamic result = await _auth.signInWithGoogle();
                               loading = true;
                               if (result == null) {
                                 setState(() {

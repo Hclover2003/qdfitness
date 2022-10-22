@@ -46,13 +46,14 @@ class Exercise {
 }
 
 class ExerciseLog {
-  String name;
-  int calories;
-  double hours;
-  Timestamp createdat;
   String uid;
   String id;
+  String name;
+  String level;
+  int calories;
+  double hours;
   bool saved;
+  Timestamp createdat;
 
   @override
   String toString() {
@@ -66,5 +67,6 @@ class ExerciseLog {
       this.createdat,
       this.uid,
       this.id,
+      this.level,
       this.saved});
 }

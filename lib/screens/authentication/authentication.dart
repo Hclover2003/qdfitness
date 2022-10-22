@@ -8,8 +8,10 @@ class Authenticate extends StatefulWidget {
 }
 
 class _AuthenticateState extends State<Authenticate> {
+  //True for signin, False for register
   bool showSignIn = true;
 
+  //Switches between SignIn and Register views
   void toggleView() {
     setState(() => showSignIn = !showSignIn);
   }
